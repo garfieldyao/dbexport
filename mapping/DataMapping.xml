@@ -61,7 +61,7 @@
 				<dbTable>ontConfig</dbTable>
 				<dbAttribute>serNum</dbAttribute>
 				<index>index(regx:1\1\:(16,8,-2)(7,9,1)(0,7,1))</index>
-				<parser>class:com.mars.dbexporter.service.parse.OntSnParser</parser>
+				<parser>class:com.mars.dbexport.service.parse.OntSnParser</parser>
 				<default>ALCL:00000000</default>
 			</attribute>
 			<attribute>
