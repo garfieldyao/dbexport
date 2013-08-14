@@ -12,10 +12,6 @@ import java.util.List;
 public interface DbConvertor {
 	public void exportDb2xml(String filePath) throws Exception;
 
-	public void loadDbTables();
-
-	public void loadDbData();
-
 	public void loadCLIMapping();
 
 	public List<String> genrateCLICommands();

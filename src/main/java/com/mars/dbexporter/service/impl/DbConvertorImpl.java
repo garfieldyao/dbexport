@@ -5,7 +5,6 @@ package com.mars.dbexporter.service.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import com.mars.dbexporter.utils.PlatformUtils;
 
 public class DbConvertorImpl implements DbConvertor {
 	private final String indicator = "xml database generated";
-	private final String dbTableFile = "DbTables";
 	private final String mappingFile = "DataMapping.xml";
 
 	public DbConvertorImpl() {
@@ -209,52 +207,8 @@ public class DbConvertorImpl implements DbConvertor {
 		}
 	}
 
-	public void loadDbTables() {
-		AppContext.getDbTables().clear();
-		File file = AppContext.getResourceFactory().getMappingFile(dbTableFile);
-		if (file == null)
-			return;
-		FileInputStream fin = null;
-		BufferedReader reader = null;
-		try {
-			fin = new FileInputStream(file);
-			reader = new BufferedReader(new InputStreamReader(fin));
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				line = line.trim();
-				if (StringUtils.isNotEmpty(line)) {
-					AppContext.getDbTables().add(line);
-				}
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			try {
-				reader.close();
-				fin.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.mars.dbexporter.service.DbConvertor#loadDbData()
-	 */
-	@Override
-	public void loadDbData() {
-		// TODO Auto-generated method stub
-		AppContext.getDbDatas().clear();
-		for (String tableName : AppContext.getDbTables()) {
-			AppContext.getDbDatas().put(tableName, readDbXml(tableName));
-		}
-	}
-
 	@SuppressWarnings("unchecked")
-	private List<DbEntry> readDbXml(String fileName) {
+	public List<DbEntry> readDbXml(String fileName) {
 		List<DbEntry> datas = new ArrayList<DbEntry>();
 		File defineFile = AppContext.getResourceFactory().getDbDefineFile(
 				fileName);
@@ -348,8 +302,13 @@ public class DbConvertorImpl implements DbConvertor {
 
 			// sort
 			for (CLIAttribute tmpattr : attributes) {
-				GenericUtils.sortDbEntry(tmpattr,
-						AppContext.getDbDatas().get(tmpattr.getDbTable()));
+				String tmpName = tmpattr.getDbTable();
+				List<DbEntry> entryList = AppContext.getDbDatas().get(tmpName);
+				if (entryList == null) {
+					entryList = readDbXml(tmpName);
+					GenericUtils.sortDbEntry(tmpattr, entryList);
+					AppContext.getDbDatas().put(tmpName, entryList);
+				}
 			}
 
 			List<DbEntry> indexList = new ArrayList<DbEntry>();

@@ -41,8 +41,6 @@ public class ExecTaskCmdImpl implements ExecTaskCmd {
 			}
 		}
 
-		convetor.loadDbTables();
-		convetor.loadDbData();
 		convetor.loadCLIMapping();
 		List<String> cliCommands = convetor.genrateCLICommands();
 		File file = new File(AppContext.getAppParamters().getDstPath());
