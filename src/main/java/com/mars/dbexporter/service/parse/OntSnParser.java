@@ -24,7 +24,7 @@ public class OntSnParser implements Parser {
 		// TODO Auto-generated method stub
 		String srcData = data.getValue();
 		String vendor = GenericUtils.parseHex2String(srcData.substring(2, 10));
-		String sn = srcData.substring(10);
+		String sn = srcData.substring(10).toUpperCase();
 		return vendor + ":" + sn;
 	}
 
