@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.mars</groupId>
-	<artifactId>dbexporter</artifactId>
+	<artifactId>dbexport</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>dbexporter</name>
+	<name>dbexport</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -62,7 +62,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>com.mars.dbexporter.AppLoader</mainClass>
+							<mainClass>com.mars.dbexport.AppLoader</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
