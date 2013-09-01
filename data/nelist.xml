@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nes>
+	<ne>
+		<ip>135.251.199.28</ip>
+		<community>public</community>
+		<username>isadmin</username>
+		<password>ans#150</password>
+	</ne>
+	<ne>
+		<ip>135.251.201.58</ip>
+	</ne>
+</nes>

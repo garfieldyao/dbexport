@@ -3,7 +3,6 @@
  */
 package com.mars.dbexport.bo;
 
-import com.mars.dbexport.bo.enums.OltType;
 
 /**
  * @author Yao Liqiang
@@ -12,18 +11,26 @@ import com.mars.dbexport.bo.enums.OltType;
  */
 public class AppParamters {
 	private boolean guiMode = false;
-	private OltType oltType = OltType.FX7360;
-	// skip DB file convertion
-	private boolean skipDb = false;
-	// skip IHUB
-	private boolean skipLanx = false;
-	
+
 	private boolean trace = false;
-	
+
 	private boolean nofilter = false;
-	
-	private String dbPath = null;
-	private String dstPath = null;
+
+	private boolean auto = false;
+
+	private boolean skipcli = false;
+
+	private String ftpIp = "127.0.0.1";
+	private String ftpUser = "user";
+	private String ftpPwd = "user";
+	private int ftpPort = 21;
+	private String ftpDir = "dm_complete.tar";
+
+	private String community = "public";
+	private String cliUser = "isadmin";
+	private String cliPwd = "ans#150";
+
+	private int maxThread = 10;
 
 	/**
 	 * @return the guiMode
@@ -41,109 +48,6 @@ public class AppParamters {
 	}
 
 	/**
-	 * @return the dbPath
-	 */
-	public String getDbPath() {
-		return dbPath;
-	}
-
-	/**
-	 * @param dbPath
-	 *            the dbPath to set
-	 */
-	public void setDbPath(String dbPath) {
-		this.dbPath = dbPath;
-	}
-
-	/**
-	 * @return the dstPath
-	 */
-	public String getDstPath() {
-		return dstPath;
-	}
-
-	/**
-	 * @param dstPath
-	 *            the dstPath to set
-	 */
-	public void setDstPath(String dstPath) {
-		this.dstPath = dstPath;
-	}
-
-	/**
-	 * @return the oltType
-	 */
-	public OltType getOltType() {
-		return oltType;
-	}
-
-	/**
-	 * @param oltType
-	 *            the oltType to set
-	 */
-	public void setOltType(OltType oltType) {
-		this.oltType = oltType;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		StringBuilder sb = new StringBuilder();
-		sb.append("GuiMode=");
-		sb.append(this.guiMode);
-		sb.append(",");
-		sb.append("oltType=");
-		sb.append(this.oltType);
-		sb.append(",");
-		sb.append("dbPath=");
-		sb.append(this.dbPath);
-		sb.append(",");
-		sb.append("dstPath=");
-		sb.append(this.dstPath);
-		sb.append(",");
-		sb.append("skipDB=");
-		sb.append(this.skipDb);
-		sb.append(",");
-		sb.append("skipLanx=");
-		sb.append(this.skipLanx);
-		return sb.toString();
-	}
-
-	/**
-	 * @return the skipDb
-	 */
-	public boolean isSkipDb() {
-		return skipDb;
-	}
-
-	/**
-	 * @param skipDb
-	 *            the skipDb to set
-	 */
-	public void setSkipDb(boolean skipDb) {
-		this.skipDb = skipDb;
-	}
-
-	/**
-	 * @return the skipLanx
-	 */
-	public boolean isSkipLanx() {
-		return skipLanx;
-	}
-
-	/**
-	 * @param skipLanx the skipLanx to set
-	 */
-	public void setSkipLanx(boolean skipLanx) {
-		this.skipLanx = skipLanx;
-	}
-
-	/**
 	 * @return the nofilter
 	 */
 	public boolean isNofilter() {
@@ -151,7 +55,8 @@ public class AppParamters {
 	}
 
 	/**
-	 * @param nofilter the nofilter to set
+	 * @param nofilter
+	 *            the nofilter to set
 	 */
 	public void setNofilter(boolean nofilter) {
 		this.nofilter = nofilter;
@@ -165,9 +70,135 @@ public class AppParamters {
 	}
 
 	/**
-	 * @param trace the trace to set
+	 * @param trace
+	 *            the trace to set
 	 */
 	public void setTrace(boolean trace) {
 		this.trace = trace;
+	}
+
+	public boolean isAuto() {
+		return auto;
+	}
+
+	public void setAuto(boolean auto) {
+		this.auto = auto;
+	}
+
+	public boolean isSkipcli() {
+		return skipcli;
+	}
+
+	public void setSkipcli(boolean skipcli) {
+		this.skipcli = skipcli;
+	}
+
+	public String getFtpIp() {
+		return ftpIp;
+	}
+
+	public void setFtpIp(String ftpIp) {
+		this.ftpIp = ftpIp;
+	}
+
+	public String getFtpUser() {
+		return ftpUser;
+	}
+
+	public void setFtpUser(String ftpUser) {
+		this.ftpUser = ftpUser;
+	}
+
+	public String getFtpPwd() {
+		return ftpPwd;
+	}
+
+	public void setFtpPwd(String ftpPwd) {
+		this.ftpPwd = ftpPwd;
+	}
+
+	public int getFtpPort() {
+		return ftpPort;
+	}
+
+	public void setFtpPort(int ftpPort) {
+		this.ftpPort = ftpPort;
+	}
+
+	public String getFtpDir() {
+		return ftpDir;
+	}
+
+	public void setFtpDir(String ftpDir) {
+		this.ftpDir = ftpDir;
+	}
+
+	public String getCommunity() {
+		return community;
+	}
+
+	public void setCommunity(String community) {
+		this.community = community;
+	}
+
+	public String getCliUser() {
+		return cliUser;
+	}
+
+	public void setCliUser(String cliUser) {
+		this.cliUser = cliUser;
+	}
+
+	public String getCliPwd() {
+		return cliPwd;
+	}
+
+	public void setCliPwd(String cliPwd) {
+		this.cliPwd = cliPwd;
+	}
+
+	public int getMaxThread() {
+		return maxThread;
+	}
+
+	public void setMaxThread(int maxThread) {
+		this.maxThread = maxThread;
+	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		StringBuilder sb = new StringBuilder("AppParameters:");
+		sb.append(" guiMode=");
+		sb.append(guiMode ? "true" : "false");
+		sb.append(" trace=");
+		sb.append(trace ? "true" : "false");
+		sb.append(" nofilter=");
+		sb.append(nofilter ? "true" : "false");
+		sb.append(" auto=");
+		sb.append(auto ? "true" : "false");
+		sb.append(" skipcli=");
+		sb.append(skipcli ? "true" : "false");
+		sb.append(" ftpIp=");
+		sb.append(ftpIp);
+		sb.append(" ftpUser=");
+		sb.append(ftpUser);
+		sb.append(" ftppwd=");
+		sb.append(ftpPwd);
+		sb.append(" ftpPort=");
+		sb.append(ftpPort);
+		sb.append(" ftpDir=");
+		sb.append(ftpDir);
+		sb.append(" ftpIp=");
+		sb.append(ftpIp);
+		sb.append(" community=");
+		sb.append(community);
+		sb.append(" cliUser=");
+		sb.append(cliUser);
+		sb.append(" clipwd=");
+		sb.append(cliPwd);
+		sb.append(" maxThread=");
+		sb.append(maxThread);
+		return sb.toString();
 	}
 }

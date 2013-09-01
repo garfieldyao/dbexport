@@ -9,7 +9,7 @@ package com.mars.dbexport.bo.enums;
  * @description
  */
 public enum ErrorCode {
-	AppIsRunning(1, "Application is running"), FileNotFound(2, "File not exist"), PlatformNotSupport(
+	AppIsRunning(1, "Another instance is running"), FileNotFound(2, "File not exist"), PlatformNotSupport(
 			3, "This application not support your OS"), ProcError(254, "Procce Error");
 
 	private int id;

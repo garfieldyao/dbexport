@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import com.mars.dbexport.AppContext;
+
 /**
  * 
  * @author Yao Liqiang
@@ -23,9 +25,16 @@ public class ResourceFactory {
 	public final String en_file = "en_us.properties";
 
 	public final String dataRoot = "data/";
+	@Deprecated
 	public final String dbDefinRoot = "data/xml/";
+	@Deprecated
 	public final String dbDataRoot = "data/xml/data/";
 	public final String mappingRoot = "mapping/";
+	public final String mappingFilePrefix = "datamapping";
+	public final String configFile = "config.ini";
+	public final String neFile = "nelist.xml";
+	public final String infoFile = "cli.ini";
+	public final String dbFile = "dm_complete.tar";
 
 	private Properties prop_i18n;
 
@@ -41,15 +50,22 @@ public class ResourceFactory {
 		return getUrl(sb.toString());
 	}
 
+	@Deprecated
 	public File getBinFile(String fileName) {
 		return getFile(dataRoot, fileName);
 	}
 
+	public File getConfigFile(String fileName) {
+		return getFile(dataRoot, fileName);
+	}
+
+	@Deprecated
 	public File getDbDefineFile(String fileName) {
 		return getFile(dbDefinRoot, fileName);
 
 	}
 
+	@Deprecated
 	public File getDbDataFile(String fileName) {
 		return getFile(dbDataRoot, fileName);
 	}
@@ -61,7 +77,8 @@ public class ResourceFactory {
 			for (File tmp : mappingDir.listFiles()) {
 				// TODO sort
 				if (tmp.isFile()
-						&& tmp.getName().toLowerCase().endsWith(".xml"))
+						&& tmp.getName().toLowerCase()
+								.startsWith(mappingFilePrefix))
 					files.add(tmp);
 			}
 		}
@@ -116,10 +133,10 @@ public class ResourceFactory {
 			StringBuilder sb = new StringBuilder();
 			sb.append(rootPath);
 			sb.append(i18nRoot);
-			// if (ClientContext.getLanguage() == Lanaguage.CN)
-			// sb.append(cn_file);
-			// else
-			sb.append(en_file);
+			if ("cn".equals(AppContext.getLanguage()))
+				sb.append(cn_file);
+			else
+				sb.append(en_file);
 			URL url = getUrl(sb.toString());
 			try {
 				prop_i18n.load(url.openStream());

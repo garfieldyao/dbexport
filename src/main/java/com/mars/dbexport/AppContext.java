@@ -3,21 +3,23 @@
  */
 package com.mars.dbexport;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import org.apache.commons.lang.ArrayUtils;
 
 import com.mars.dbexport.bo.AppParamters;
 import com.mars.dbexport.bo.CLICommand;
-import com.mars.dbexport.bo.DbEntry;
-import com.mars.dbexport.bo.enums.OltType;
+import com.mars.dbexport.bo.NetworkElement;
+import com.mars.dbexport.gui.AppMainFrame;
+import com.mars.dbexport.service.LogFactory;
 import com.mars.dbexport.service.ResourceFactory;
 import com.mars.dbexport.service.parse.Parser;
 
@@ -27,135 +29,27 @@ import com.mars.dbexport.service.parse.Parser;
  * @description
  */
 public class AppContext {
+	public static boolean debug = false;
 	private static ResourceFactory resourceFactory = null;
 	private static AppParamters appParameters = null;
-	private static List<String> dbTables;
-	private static Map<String, List<DbEntry>> dbDatas;
-	private static Set<String> dbSort;
+	// private static List<String> dbTables;
+	// private static Map<String, List<DbEntry>> dbDatas;
+	// private static Set<String> dbSort;
 	private static List<CLICommand> cliCommands;
+	private static List<String> infoList;
+	private static Map<String, NetworkElement> neList;
 	private static Map<String, Parser> parsers;
+
+	private static AppMainFrame mainFrame;
+	private static Map<String, Icon> iconList;
+	private static LogFactory logFactory;
+	private static int SnmpMaxRepetitions = 40;
+
 
 	public static ResourceFactory getResourceFactory() {
 		if (resourceFactory == null)
 			resourceFactory = new ResourceFactory();
 		return resourceFactory;
-	}
-
-	public static boolean initAppParameters(String[] args) {
-		// error msg
-		StringBuilder errMsg = new StringBuilder();
-		errMsg.append("java -jar dbexporter.jar -in (input) [-out (output)] [-(7360|7360l|7342epon|7342gpon)] [-skipdb] [-skiplanx] [-nofilter] [-trace]");
-		errMsg.append("\r\n");
-		errMsg.append("-in : Databse file");
-		errMsg.append("\r\n");
-		errMsg.append("-out : output file");
-		errMsg.append("\r\n");
-		errMsg.append("(type) : Device type");
-		errMsg.append("\r\n");
-		errMsg.append("-skipdb : skip Database convertion");
-		errMsg.append("\r\n");
-		errMsg.append("-skiplanx : skip IHUB");
-		errMsg.append("\r\n");
-		errMsg.append("-nofilter : disable the filter");
-		errMsg.append("\r\n");
-		errMsg.append("\r\n");
-		errMsg.append("java -jar dbexporter.jar -g");
-		errMsg.append("\r\n");
-		errMsg.append("-g : GUI mode");
-		errMsg.append("\r\n");
-
-		String regx = null;
-		Pattern pat = null;
-		Matcher matcher = null;
-
-		appParameters = new AppParamters();
-
-		if (ArrayUtils.isEmpty(args)) {
-			System.out.println(errMsg.toString());
-			return false;
-		}
-
-		StringBuilder sb = new StringBuilder(" ");
-		for (String arg : args) {
-			sb.append(arg.trim());
-			sb.append(" ");
-		}
-		String str = sb.toString();
-
-		if ("-g".equals(str.trim())) {
-			appParameters.setGuiMode(true);
-			return true;
-		}
-
-		regx = " -in[ ]?[^ ]+ ";
-		pat = Pattern.compile(regx);
-		matcher = pat.matcher(str);
-		if (matcher.find()) {
-			String group = matcher.group().trim();
-			appParameters.setGuiMode(false);
-			appParameters.setDbPath(group.substring(3).trim());
-		} else {
-			System.out.println(errMsg.toString());
-			return false;
-		}
-
-		regx = "( -7342epon )|( -7342gpon )|( -7360 )|( -7360l )";
-		pat = Pattern.compile(regx);
-		matcher = pat.matcher(str);
-		if (matcher.find()) {
-			String group = matcher.group().toLowerCase().trim();
-			if (group.contains("7342epon")) {
-				appParameters.setOltType(OltType.EPON7342);
-			} else if (group.contains("7342gpon")) {
-				appParameters.setOltType(OltType.GPON7342);
-			} else if (group.contains("7360l")) {
-				appParameters.setOltType(OltType.FX7360L);
-			} else if (group.contains("7360")) {
-				appParameters.setOltType(OltType.FX7360);
-			}
-		}
-
-		regx = " -skipdb ";
-		pat = Pattern.compile(regx);
-		matcher = pat.matcher(str);
-		appParameters.setSkipDb(matcher.find());
-
-		regx = " -skiplanx ";
-		pat = Pattern.compile(regx);
-		matcher = pat.matcher(str);
-		appParameters.setSkipLanx(matcher.find());
-
-		regx = " -nofilter ";
-		pat = Pattern.compile(regx);
-		matcher = pat.matcher(str);
-		appParameters.setNofilter(matcher.find());
-		
-		regx = " -trace ";
-		pat = Pattern.compile(regx);
-		matcher = pat.matcher(str);
-		appParameters.setTrace(matcher.find());
-
-		regx = " -out[ ]?[^ ]+ ";
-		pat = Pattern.compile(regx);
-		matcher = pat.matcher(str);
-		if (matcher.find()) {
-			String group = matcher.group().trim();
-			appParameters.setDstPath(group.substring(4).trim());
-		} else {
-			appParameters.setDstPath(appParameters.getDbPath().substring(0,
-					appParameters.getDbPath().length() - 4)
-					+ ".sh");
-		}
-
-		return true;
-	}
-
-	public static Map<String, List<DbEntry>> getDbDatas() {
-		if (dbDatas == null) {
-			dbDatas = new HashMap<String, List<DbEntry>>();
-		}
-
-		return dbDatas;
 	}
 
 	public static AppParamters getAppParamters() {
@@ -164,40 +58,108 @@ public class AppContext {
 		return appParameters;
 	}
 
-	/**
-	 * @return the dbTables
-	 */
-	public static List<String> getDbTables() {
-		if (dbTables == null) {
-			dbTables = new ArrayList<String>();
-		}
-		return dbTables;
-	}
-
-	/**
-	 * @return the cliCommands
-	 */
-	public static List<CLICommand> getCliCommands() {
-		if (cliCommands == null) {
-			cliCommands = new ArrayList<CLICommand>();
-		}
-		return cliCommands;
+	public static void setAppParameters(AppParamters appParameters) {
+		AppContext.appParameters = appParameters;
 	}
 
 	public static Map<String, Parser> getParsers() {
 		if (parsers == null) {
-			parsers = new HashMap<String, Parser>();
+			parsers = new ConcurrentHashMap<String, Parser>();
 		}
 		return parsers;
 	}
 
-	/**
-	 * @return the dbSort
-	 */
-	public static Set<String> getDbSort() {
-		if (dbSort == null) {
-			dbSort = new HashSet<String>();
+	public static AppMainFrame getMainFrame() {
+		return mainFrame;
+	}
+
+	public static void setMainFrame(AppMainFrame mainFrame) {
+		AppContext.mainFrame = mainFrame;
+	}
+
+	public static String getI18nString(String key) {
+		return getResourceFactory().getI18NString(key);
+	}
+
+	public static String[] getI18nString(String... keys) {
+		if (ArrayUtils.isEmpty(keys))
+			return new String[0];
+		List<String> values = new ArrayList<String>();
+		for (String key : keys) {
+			values.add(getI18nString(key));
 		}
-		return dbSort;
+		return values.toArray(new String[0]);
+	}
+
+	public static Map<String, Icon> getIconList() {
+		if (iconList == null)
+			iconList = new HashMap<String, Icon>();
+		return iconList;
+	}
+
+	public static Icon getIcon(String iconName) {
+		if (getIconList().containsKey(iconName))
+			return iconList.get(iconName);
+		Icon icon = new ImageIcon(getResourceFactory().getImageSource(iconName));
+		if (icon != null)
+			iconList.put(iconName, icon);
+		return icon;
+	}
+
+	public static Image getImage(String name) {
+		Icon icon = getIcon(name);
+		if (icon == null)
+			return null;
+		return ((ImageIcon) icon).getImage();
+	}
+
+	public static Image getLogoIcon() {
+		String name = "alu.png";
+		Icon icon = getIcon(name);
+		if (icon == null)
+			return null;
+		return ((ImageIcon) icon).getImage();
+	}
+
+	public static String getLanguage() {
+		// TODO Auto-generated method stub
+		return "en";
+	}
+
+	public static int getMaxRepetitions() {
+		// TODO Auto-generated method stub
+		return SnmpMaxRepetitions;
+	}
+
+	public static LogFactory getLogFactory() {
+		if (logFactory == null)
+			logFactory = new LogFactory();
+		return logFactory;
+	}
+
+	public static List<CLICommand> getCliCommands() {
+		if (cliCommands == null)
+			cliCommands = new ArrayList<CLICommand>();
+		return cliCommands;
+	}
+
+	public static Map<String, NetworkElement> getNeList() {
+		if (neList == null)
+			neList = new HashMap<String, NetworkElement>();
+		return neList;
+	}
+
+	public static void setNeList(Map<String, NetworkElement> neList) {
+		AppContext.neList = neList;
+	}
+
+	public static List<String> getInfoList() {
+		if (infoList == null)
+			infoList = new ArrayList<String>();
+		return infoList;
+	}
+
+	public static void setInfoList(List<String> infoList) {
+		AppContext.infoList = infoList;
 	}
 }

@@ -10,9 +10,19 @@ import java.util.List;
  * 
  */
 public interface DbConvertor {
+	/**
+	 * Invoke migration tools, had been relaced by java native code
+	 * 
+	 * @deprecated
+	 * @param filePath
+	 * @throws Exception
+	 */
 	public void exportDb2xml(String filePath) throws Exception;
 
-	public void loadCLIMapping();
-
+	/**
+	 * Generate CLI commands, loadCLIMapping must be finished before
+	 * 
+	 * @return
+	 */
 	public List<String> genrateCLICommands();
 }

@@ -1,0 +1,59 @@
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="ROLLINGFILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/result.log</File>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>logs/result.%i.log</FileNamePattern>
+			<MinIndex>1</MinIndex>
+			<MaxIndex>30</MaxIndex>
+		</rollingPolicy>
+
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>1MB</MaxFileSize>
+		</triggeringPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%date %msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="ROLLINGFILE_ERROR"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/error.log</File>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>logs/error.%i.log</FileNamePattern>
+			<MinIndex>1</MinIndex>
+			<MaxIndex>30</MaxIndex>
+		</rollingPolicy>
+
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>1MB</MaxFileSize>
+		</triggeringPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%date %msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<logger name="result" level="info">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ROLLINGFILE" />
+	</logger>
+
+	<logger name="error" level="info">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ROLLINGFILE_ERROR" />
+	</logger>
+	
+</configuration>

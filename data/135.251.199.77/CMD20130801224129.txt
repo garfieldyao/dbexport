@@ -1,0 +1,2 @@
+
+configure equipment slot lt:1/1/1 admin-state up

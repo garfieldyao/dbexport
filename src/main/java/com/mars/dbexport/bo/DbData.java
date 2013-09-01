@@ -15,8 +15,6 @@ public class DbData implements Comparable<DbData> {
 	private String name = "";
 	private DataType type = DataType.UNDEFINE;
 	private String value = "";
-	private String defaultValue = "";
-	private int length = -1;
 
 	/**
 	 * @return the name
@@ -63,36 +61,6 @@ public class DbData implements Comparable<DbData> {
 		this.value = value;
 	}
 
-	/**
-	 * @return the defaultValue
-	 */
-	public String getDefaultValue() {
-		return defaultValue;
-	}
-
-	/**
-	 * @param defaultValue
-	 *            the defaultValue to set
-	 */
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
-	}
-
-	/**
-	 * @return the length
-	 */
-	public int getLength() {
-		return length;
-	}
-
-	/**
-	 * @param length
-	 *            the length to set
-	 */
-	public void setLength(int length) {
-		this.length = length;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -107,12 +75,6 @@ public class DbData implements Comparable<DbData> {
 		sb.append(",");
 		sb.append("Type=");
 		sb.append(this.type);
-		sb.append(",");
-		sb.append("Length=");
-		sb.append(this.length);
-		sb.append(",");
-		sb.append("Default=");
-		sb.append(this.defaultValue);
 		return sb.toString();
 	}
 

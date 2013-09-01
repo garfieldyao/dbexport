@@ -3,8 +3,8 @@
  */
 package com.mars.dbexport.service.parse;
 
-import com.mars.dbexport.AppContext;
 import com.mars.dbexport.bo.DbData;
+import com.mars.dbexport.bo.enums.OltType;
 import com.mars.dbexport.utils.GenericUtils;
 import com.mars.dbexport.utils.IfindexUtils;
 
@@ -26,8 +26,7 @@ public class OntIfindexParser implements Parser {
 		try {
 			int index = Integer.parseInt(GenericUtils.parseCommData(data));
 			if (index > 0) {
-				return IfindexUtils.parseOntInterface(index, AppContext
-						.getAppParamters().getOltType());
+				return IfindexUtils.parseOntInterface(index, OltType.FX7360);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
