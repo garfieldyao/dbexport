@@ -61,6 +61,11 @@
 			<version>1.5</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.3</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
@@ -114,6 +119,22 @@
 							<tasks>
 								<copy todir="target/DBExport/mapping" overwrite="true">
 									<fileset dir="mapping">
+										<include name="*" />
+									</fileset>
+								</copy>
+							</tasks>
+						</configuration>
+					</execution>
+					<execution>
+						<id>data-copy</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<copy todir="target/DBExport/data" overwrite="true">
+									<fileset dir="data">
 										<include name="*" />
 									</fileset>
 								</copy>

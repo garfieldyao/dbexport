@@ -73,6 +73,11 @@ public abstract class BatchManager {
 					try {
 						BatchResult result = task.get();
 						results.add(result);
+						if (result.isSucceed()) {
+							logger.info(result.getIpAddr() + "\t\tSucceed");
+						} else {
+							logger.info(result.getIpAddr() + "\t\tFailed");
+						}
 					} catch (Exception ex) {
 					}
 					tasklist.remove(task);

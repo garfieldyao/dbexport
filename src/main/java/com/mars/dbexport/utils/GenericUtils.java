@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.mars.dbexport.AppContext;
@@ -20,6 +21,7 @@ import com.mars.dbexport.bo.DbData;
 import com.mars.dbexport.bo.DbEntry;
 import com.mars.dbexport.bo.DbIndex;
 import com.mars.dbexport.bo.enums.DataType;
+import com.mars.dbexport.service.impl.DbConvertorImpl;
 import com.mars.dbexport.service.parse.Parser;
 
 /**
@@ -27,7 +29,12 @@ import com.mars.dbexport.service.parse.Parser;
  * 
  */
 public class GenericUtils {
+
 	public static String parseCommData(DbData dbData) {
+		return parseCommData(dbData, false);
+	}
+
+	public static String parseCommData(DbData dbData, boolean reverse) {
 		String srcData = dbData.getValue();
 		if (srcData != null) {
 			srcData = srcData.trim();
@@ -38,28 +45,22 @@ public class GenericUtils {
 			return "";
 		}
 		DataType type = dbData.getType();
-		if (type == DataType.STRING) {
-			if (srcData.startsWith("0x")) {
-				return parseHex2String(srcData.substring(2));
-			} else {
-				return srcData;
+		String value = srcData.substring(2);
+		if (reverse) {
+			StringBuilder sb = new StringBuilder();
+			for (int k = value.length() - 1; k >= 0; k--) {
+				sb.append(value.charAt(k));
 			}
-		} else if (type == DataType.UNSIGNED_CHAR
-				|| type == DataType.UNSIGNED_SHORT) {
-			if (srcData.startsWith("0x")) {
-				return "" + Integer.parseInt(srcData.substring(2), 16);
-			} else {
-				return srcData;
-			}
-		} else if (type == DataType.UNSIGNED_LONG) {
-			if (srcData.startsWith("0x")) {
-				return "" + Long.parseLong(srcData.substring(2), 16);
-			} else {
-				return srcData;
-			}
+			value = sb.toString();
 		}
 
-		return "";
+		if (type == DataType.STRING) {
+			return parseHex2String(value);
+		} else if (type == DataType.UNSIGNED_LONG || type == DataType.LONG) {
+			return "" + Long.parseLong(value, 16);
+		} else {
+			return "" + Integer.parseInt(value, 16);
+		}
 	}
 
 	public static String parseHex2String(String srcData) {
@@ -70,6 +71,8 @@ public class GenericUtils {
 		byte[] bytes = new byte[len / 2];
 		for (int i = 0; i < len / 2; i++) {
 			String data = srcData.substring(i * 2, i * 2 + 2);
+			if ("00".equals(data))
+				break;
 			bytes[i] = parseInt2Byte(Integer.parseInt(data, 16));
 		}
 
@@ -79,6 +82,20 @@ public class GenericUtils {
 		} catch (UnsupportedEncodingException e) {
 		}
 		return result;
+	}
+
+	public static String parseBufferString(byte[] buffer) {
+		if (ArrayUtils.isEmpty(buffer))
+			return "";
+		int len = buffer.length;
+		byte[] bytes = new byte[len];
+		for (int i = 0; i < len; i++) {
+			if (buffer[i] == 0)
+				break;
+			bytes[i] = buffer[i];
+		}
+
+		return new String(bytes);
 	}
 
 	public static byte parseInt2Byte(int src) {
@@ -93,7 +110,7 @@ public class GenericUtils {
 
 	public static String parseRegxData(DbData dbData, String parser) {
 		String srcData = parseCommData(dbData);
-		int value = Integer.parseInt(srcData.trim());
+		long value = Long.parseLong(srcData.trim());
 		String regx = "regx:[^: ]*:([(][0-9]+,[0-9]+,[-]?[0-9]+[)])+";
 		Pattern pat = Pattern.compile(regx);
 		Matcher mat = pat.matcher(parser);
@@ -174,6 +191,10 @@ public class GenericUtils {
 		}
 	}
 
+	public static String parseReverseData(DbData srcData) {
+		return parseCommData(srcData, true);
+	}
+
 	public static boolean parserBooleanData(DbData srcData, String parser) {
 		if (!parser.startsWith("bool"))
 			return false;
@@ -196,25 +217,22 @@ public class GenericUtils {
 		DbData dbData = entryList.get(0).getDbDatas().get(cmd.getDbAttribute());
 		if (dbData == null)
 			return;
-		DataType type = dbData.getType();
 		String name = dbData.getName();
-		if (type == DataType.UNSIGNED_LONG || type == DataType.UNSIGNED_SHORT
-				|| type == DataType.UNSIGNED_CHAR) {
-			DbEntry temp = null;
-			for (int i = entryList.size() - 1; i > 0; --i) {
-				for (int j = 0; j < i; ++j) {
-					if (entryList.get(j + 1).getDbDatas().get(name)
-							.compareTo(entryList.get(j).getDbDatas().get(name)) < 0) {
-						temp = entryList.get(j);
-						entryList.set(j, entryList.get(j + 1));
-						entryList.set(j + 1, temp);
-					}
+		DbEntry temp = null;
+		for (int i = entryList.size() - 1; i > 0; --i) {
+			for (int j = 0; j < i; ++j) {
+				if (entryList.get(j + 1).getDbDatas().get(name)
+						.compareTo(entryList.get(j).getDbDatas().get(name)) < 0) {
+					temp = entryList.get(j);
+					entryList.set(j, entryList.get(j + 1));
+					entryList.set(j + 1, temp);
 				}
 			}
 		}
 	}
 
-	public static String parseDataValue(String dbParser, DbData dbData) {
+	public static String parseDataValue(String dbParser, DbData dbData,
+			Object... objs) {
 		String result = "";
 		if (dbParser.startsWith("raw:")) {
 			return dbParser.substring(4).trim();
@@ -222,6 +240,8 @@ public class GenericUtils {
 			return parserBooleanData(dbData, dbParser) ? "true" : "false";
 		} else if (dbParser.startsWith("auto")) {
 			result = parseAutoData(dbData, dbParser);
+		} else if (dbParser.equals("reverse")) {
+			result = parseReverseData(dbData);
 		} else if (dbParser.startsWith("class")) {
 			String className = dbParser.substring(6);
 			Parser parser = AppContext.getParsers().get(className);
@@ -241,10 +261,40 @@ public class GenericUtils {
 			result = GenericUtils.parseRegxData(dbData, dbParser);
 		} else if (dbParser.startsWith("enum:")) {
 			result = GenericUtils.parseEnumData(dbData, dbParser);
+		} else if (dbParser.startsWith("ref:")) {
+			result = GenericUtils.parseRefData(dbData, dbParser,
+					(DbConvertorImpl) objs[0]);
 		} else {
 			result = dbData.getValue();
 		}
 		return result;
+	}
+
+	public static String parseRefData(DbData dbData, String dbParser,
+			DbConvertorImpl convertor) {
+		String regx = "ref:([^ ]+:[^ ]+:[^ ]+)";
+		Pattern pat = Pattern.compile(regx);
+		Matcher mat = pat.matcher(dbParser);
+		if (!mat.matches())
+			return "NULL";
+		String[] split = dbParser.substring(5, dbParser.length() - 1)
+				.split(":");
+		String table = split[0];
+		String index = split[1];
+		String name = split[2];
+		List<DbEntry> list = convertor.dbDatas.get(table);
+		if (list == null) {
+			list = convertor.readDbFile(table);
+			convertor.dbDatas.put(table, list);
+		}
+
+		for (DbEntry entry : list) {
+			Map<String, DbData> dbDatas = entry.getDbDatas();
+			if (dbData.getValue().equals(dbDatas.get(index).getValue())) {
+				return parseCommData(dbDatas.get(name));
+			}
+		}
+		return "NULL";
 	}
 
 	public static String parseDbEntryIndex(CLIAttribute attr, DbEntry entry) {
@@ -282,7 +332,7 @@ public class GenericUtils {
 	public static int bytes2int(byte[] src) {
 		byte[] datas = new byte[4];
 		for (int i = 0; i < src.length && i < 4; i++) {
-			datas[i] = src[i];
+			datas[src.length - i - 1] = src[i];
 		}
 		int s0 = datas[0] & 0xFF;
 		int s1 = datas[1] & 0xFF;
@@ -297,9 +347,12 @@ public class GenericUtils {
 		return s;
 	}
 
-	public static String bytes2hex(byte[] datas) {
+	public static String bytes2hex(byte[] src) {
+		byte[] datas = new byte[src.length];
+		for (int k = 0; k < src.length; k++) {
+			datas[src.length - 1 - k] = src[k];
+		}
 		StringBuilder sb = new StringBuilder();
-		sb.append("0x");
 		for (int i = datas.length - 1; i >= 0; i--) {
 			byte data = datas[i];
 			Integer d = 0;
@@ -312,7 +365,35 @@ public class GenericUtils {
 				sb.append(0);
 			sb.append(hex);
 		}
-		return sb.toString();
+		String raw = sb.toString();
+		int sx = 0;
+		for (int idx = 0; idx < raw.length(); idx++) {
+			char car = raw.charAt(idx);
+			if (car != '0')
+				break;
+			sx++;
+		}
+		raw = raw.substring(sx);
+		if (StringUtils.isEmpty(raw))
+			raw = "0";
+
+		return "0x" + raw;
+	}
+
+	// validate IP address
+	public static boolean isValidAddress(String ip) {
+		String regx = "[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+";
+		Pattern pat = Pattern.compile(regx);
+		Matcher mat = pat.matcher(ip);
+		if (!mat.matches())
+			return false;
+		String[] split = ip.split(".");
+		for (String str : split) {
+			int value = Integer.parseInt(str);
+			if (value < 0 || value > 255)
+				return false;
+		}
+		return true;
 	}
 
 	public static void main(String[] args) {

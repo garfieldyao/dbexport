@@ -32,9 +32,6 @@ public class AppContext {
 	public static boolean debug = false;
 	private static ResourceFactory resourceFactory = null;
 	private static AppParamters appParameters = null;
-	// private static List<String> dbTables;
-	// private static Map<String, List<DbEntry>> dbDatas;
-	// private static Set<String> dbSort;
 	private static List<CLICommand> cliCommands;
 	private static List<String> infoList;
 	private static Map<String, NetworkElement> neList;
@@ -44,7 +41,6 @@ public class AppContext {
 	private static Map<String, Icon> iconList;
 	private static LogFactory logFactory;
 	private static int SnmpMaxRepetitions = 40;
-
 
 	public static ResourceFactory getResourceFactory() {
 		if (resourceFactory == null)

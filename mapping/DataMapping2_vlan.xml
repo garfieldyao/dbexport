@@ -35,6 +35,77 @@
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
+			<attribute>
+				<cliname>priority</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>vStaPri</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<parser>reverse</parser>
+				<default>0</default>
+			</attribute>
+			<attribute>
+				<cliname>vmac-not-in-opt61</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>macOp61</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<parser>bool:0</parser>
+				<novalue>true</novalue>
+			</attribute>
+			<attribute>
+				<cliname>new-broadcast</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>vlanBcC</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<parser>enum:(0x3,enable)(0x4,disable)(0x5,inherit)</parser>
+				<default>inherit</default>
+			</attribute>
+			<attribute>
+				<cliname>protocol-filter</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>vGrouId</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<parser>enum:(0x30,pass-all)(0x31,pass-pppoe)(0x32,pass-ipoe)(0x33,pass-pppoe-ipoe)(0x34,pass-ipv6oe)(0x35,pass-pppoe-ipv6oe)(0x36,pass-ipoe-ipv6oe)(0x37,pass-pppoe-ipoe-ipv6oe)</parser>
+				<default>pass-all</default>
+			</attribute>
+			<attribute>
+				<cliname>pppoe-relay-tag</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>AdReTag</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<parser>enum:(0x1,true)(0x2,false)(0x3,configurable)</parser>
+				<default>false</default>
+			</attribute>
+			<attribute>
+				<cliname>new-secure-fwd</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>vSecFwd</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<parser>enum:(0x3,enable)(0x4,disable)(0x5,inherit)</parser>
+				<default>inherit</default>
+			</attribute>
+			<attribute>
+				<cliname>aging-time</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>macAgTm</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<default>4294967295</default>
+			</attribute>
+			<attribute>
+				<cliname>l2cp-transparent</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>l2cpTra</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<parser>bool:0</parser>
+				<novalue>true</novalue>
+			</attribute>
+			<attribute>
+				<cliname>in-qos-prof-name</cliname>
+				<dbTable>vlanStaTbl</dbTable>
+				<dbAttribute>InQosTc</dbAttribute>
+				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<parser>ref:(QosInProf:Index:Name)</parser>
+				<default>Ingress_Default</default>
+			</attribute>
 		</attributes>
 	</mapping>
 </mappings>

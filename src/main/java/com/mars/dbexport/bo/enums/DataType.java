@@ -11,15 +11,7 @@ package com.mars.dbexport.bo.enums;
  */
 
 public enum DataType {
-	UNSIGNED_CHAR(0), UNSIGNED_SHORT(50331648), UNSIGNED_LONG(100663296), STRING(
-			134217728), CHAR(16777216), LONG(83886080), UNDEFINE(255);
-
-	private DataType(int value) {
-		// TODO Auto-generated constructor stub
-		this.value = value;
-	}
-
-	private int value;
+	UNSIGNED_CHAR, CHAR, SHORT, UNSIGNED_SHORT, LONG, UNSIGNED_LONG, STRING, UNDEFINE;
 
 	public static DataType getType(String src) {
 		for (DataType type : DataType.values()) {
@@ -30,18 +22,27 @@ public enum DataType {
 	}
 
 	public static DataType getType(int src) {
-		for (DataType type : DataType.values()) {
-			if (type.getValue() == src)
-				return type;
+		switch (src) {
+		case 0:
+			return DataType.UNSIGNED_CHAR;
+		case 1:
+			return DataType.CHAR;
+		case 2:
+			return DataType.SHORT;
+		case 3:
+			return DataType.UNSIGNED_SHORT;
+		case 4:
+		case 5:
+			return DataType.LONG;
+		case 6:
+			return DataType.UNSIGNED_LONG;
+		case 7:
+			return DataType.LONG;
+		case 8:
+			return DataType.STRING;
+		case 9:
+		case 10:
 		}
 		return DataType.UNDEFINE;
-	}
-
-	public int getValue() {
-		return value;
-	}
-
-	public void setValue(int value) {
-		this.value = value;
 	}
 }

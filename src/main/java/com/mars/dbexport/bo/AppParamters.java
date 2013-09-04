@@ -24,11 +24,12 @@ public class AppParamters {
 	private String ftpUser = "user";
 	private String ftpPwd = "user";
 	private int ftpPort = 21;
-	private String ftpDir = "dm_complete.tar";
+	public String ftpDir = "dm_complete.tar";
 
 	private String community = "public";
 	private String cliUser = "isadmin";
 	private String cliPwd = "ans#150";
+	private int cliPort = 23;
 
 	private int maxThread = 10;
 
@@ -200,5 +201,13 @@ public class AppParamters {
 		sb.append(" maxThread=");
 		sb.append(maxThread);
 		return sb.toString();
+	}
+
+	public int getCliPort() {
+		return cliPort;
+	}
+
+	public void setCliPort(int cliPort) {
+		this.cliPort = cliPort;
 	}
 }

@@ -33,12 +33,10 @@ public class FormularParser {
 			Map<String, Integer> params) {
 		if (!validFormular(formular))
 			return 0x80000000;
-		for (char cc : formular.toCharArray()) {
-			
-		}
 		return 0;
 	}
 
+	@SuppressWarnings("unused")
 	private static int processCellFragment(String frag) {
 		return 0x80000000;
 	}

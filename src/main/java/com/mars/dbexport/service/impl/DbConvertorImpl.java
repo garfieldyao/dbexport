@@ -49,10 +49,12 @@ import com.mars.dbexport.utils.PlatformUtils;
 
 public class DbConvertorImpl implements DbConvertor {
 	private Logger logger = AppContext.getLogFactory().getLogger(
-			LogFactory.LOG_ERROR);
+			LogFactory.LOG_RESULT);
 	private final String indicator = "xml database generated";
 	private NetworkElement ne = null;
-	private Map<String, List<DbEntry>> dbDatas = new HashMap<String, List<DbEntry>>();
+	public Map<String, List<DbEntry>> dbDatas = new HashMap<String, List<DbEntry>>();
+	private int milestone = 0;
+	private TarArchiveInputStream taris = null;
 
 	public DbConvertorImpl(NetworkElement ne) {
 		this.ne = ne;
@@ -66,6 +68,8 @@ public class DbConvertorImpl implements DbConvertor {
 	@Override
 	public List<String> genrateCLICommands() {
 		// TODO Auto-generated method stub
+		logger.info(ne.getIpAddress() + "\t\tStart Convert database file\t"
+				+ ne.getDbPath());
 		List<String> commands = new ArrayList<String>();
 		String lastprefix = "";
 		for (CLICommand comm : AppContext.getCliCommands()) {
@@ -139,7 +143,7 @@ public class DbConvertorImpl implements DbConvertor {
 						continue;
 
 					String dataValue = GenericUtils.parseDataValue(
-							attr.getParser(), dbData);
+							attr.getParser(), dbData, this);
 					if (!AppContext.getAppParamters().isNofilter()) {
 						if (attr.getDefaultValue() != null) {
 							if (attr.getDefaultValue().equals(dataValue))
@@ -156,9 +160,11 @@ public class DbConvertorImpl implements DbConvertor {
 							sb.append(" ");
 						}
 					} else if (StringUtils.isEmpty(dataValue)) {
-						sb.append("no ");
-						sb.append(attr.getCliName());
-						sb.append(" ");
+						if (AppContext.getAppParamters().isNofilter()) {
+							sb.append("no ");
+							sb.append(attr.getCliName());
+							sb.append(" ");
+						}
 					} else {
 						sb.append(attr.getCliName());
 						sb.append(" ");
@@ -185,16 +191,16 @@ public class DbConvertorImpl implements DbConvertor {
 				}
 			}
 		}
+		logger.info(ne.getIpAddress() + "\t\tConvert database file finished");
 		return commands;
 	}
 
-	private List<DbEntry> readDbFile(String tableName) {
+	public List<DbEntry> readDbFile(String tableName) {
 		List<DbEntry> datas = new ArrayList<DbEntry>();
 		// TODO
 		File file = new File(ne.getDbPath());
 		FileInputStream fis = null;
 		BufferedInputStream bfin = null;
-		TarArchiveInputStream taris = null;
 		try {
 			fis = new FileInputStream(file);
 			bfin = new BufferedInputStream(fis);
@@ -213,58 +219,104 @@ public class DbConvertorImpl implements DbConvertor {
 				return datas;
 			}
 
-			Map<String, DbData> dbMap = new HashMap<String, DbData>();
+			milestone = 0;
+			byte[] buffer = null;
 
-			byte[] buffer = new byte[16];
-			// Table info
-			taris.read(buffer, 0, 16);
+			List<DbData> dbDef = new ArrayList<DbData>();
+
+			// dummy
+			read(2);
+
+			// table id
+			read(2);
+			// table offset
+			buffer = read(4);
+			int toffset = GenericUtils.bytes2int(buffer);
+
+			read(8);
 			// Table Name
-			taris.read(buffer, 0, 16);
+			read(16);
+			// Record len
+			buffer = read(4);
+			int recordLen = GenericUtils.bytes2int(buffer);
+
 			// Table info
-			taris.read(buffer, 0, 16);
+			buffer = read(12);
 			while (true) {
-				int read = taris.read(buffer, 0, 4);
-				if (read < 0)
+				buffer = read(4);
+				if (buffer == null)
 					break;
 
 				// Attribute
-				buffer = new byte[8];
-				taris.read(buffer, 0, 8);
-				String attrName = new String(buffer).trim();
+				buffer = read(8);
+				String attrName = GenericUtils.parseBufferString(buffer).trim();
 				if ("__oi__".equals(attrName)) {
-					buffer = new byte[20];
-					taris.read(buffer, 0, 20);
+					read(20);
 					continue;
 				}
 				if ("__sc__".equals(attrName))
 					break;
 				DbData dbdata = new DbData();
 				dbdata.setName(attrName);
-				dbMap.put(attrName, dbdata);
+				dbDef.add(dbdata);
 
 				// type
-				buffer = new byte[4];
-				taris.read(buffer, 0, 4);
+				buffer = read(4);
 				int dtype = GenericUtils.bytes2int(buffer);
+
+				// length
+				buffer = read(4);
+				dbdata.setLen(GenericUtils.bytes2int(buffer));
+
 				DataType type = DataType.getType(dtype);
 				dbdata.setType(type);
 
-				// length
-				taris.read(buffer, 0, 4);
-
 				// use init
-				buffer = new byte[1];
-				taris.read(buffer, 0, 1);
+				buffer = read(1);
 
-				buffer = new byte[4];
-				taris.read(buffer, 0, 3);
+				buffer = read(3);
 
 				// init value
-				taris.read(buffer, 0, 4);
+				buffer = read(4);
 
-				taris.read(buffer, 0, 4);
+				// offset
+				buffer = read(2);
+				int currOffset = GenericUtils.bytes2int(buffer);
+				dbdata.setOffset(currOffset);
 
-				System.out.println(dbdata.toString() + "   " + dtype);
+				buffer = read(2);
+
+				if (AppContext.debug)
+					System.out.println(dbdata.toString() + "    coffset="
+							+ currOffset);
+			}
+
+			read(toffset - milestone);
+
+			while (true) {
+				buffer = read(recordLen);
+				if (buffer == null)
+					break;
+
+				byte[] sub = readbyte(buffer, 2, 2);
+				String recoadId = GenericUtils.bytes2hex(sub);
+				if ("0xffff".equals(recoadId))
+					break;
+
+				DbEntry tmpentry = new DbEntry();
+				tmpentry.setTableName(tableName);
+				datas.add(tmpentry);
+				for (DbData dbdef : dbDef) {
+					sub = readbyte(buffer, dbdef.getOffset(), dbdef.getLen());
+					DbData tmpdata = new DbData();
+					tmpdata.setName(dbdef.getName());
+					tmpdata.setType(dbdef.getType());
+					tmpdata.setLen(dbdef.getLen());
+					tmpdata.setValue(GenericUtils.bytes2hex(sub));
+					if (AppContext.debug)
+						System.out.println(tmpdata.toString());
+					tmpentry.getDbDatas().put(tmpdata.getName(), tmpdata);
+				}
 			}
 
 		} catch (Exception ex) {
@@ -289,6 +341,23 @@ public class DbConvertorImpl implements DbConvertor {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		return datas;
+	}
+
+	private byte[] read(int step) throws Exception {
+		byte[] tmpbuffer = new byte[step];
+		int read = taris.read(tmpbuffer, 0, step);
+		if (read < 0)
+			return null;
+		milestone += step;
+		return tmpbuffer;
+	}
+
+	private byte[] readbyte(byte[] buffer, int start, int len) {
+		byte[] datas = new byte[len];
+		for (int idx = 0; idx < len; idx++) {
+			datas[idx] = buffer[start + idx];
 		}
 		return datas;
 	}

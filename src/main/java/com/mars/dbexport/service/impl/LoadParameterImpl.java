@@ -36,7 +36,7 @@ import com.mars.dbexport.utils.FileUtils;
 
 public class LoadParameterImpl implements LoadParameter {
 	private Logger logger = AppContext.getLogFactory().getLogger(
-			LogFactory.LOG_ERROR);
+			LogFactory.LOG_RESULT);
 
 	@Override
 	public boolean initSystemParam(String[] args) {
@@ -109,8 +109,9 @@ public class LoadParameterImpl implements LoadParameter {
 		matcher = pat.matcher(str);
 		appParameters.setTrace(matcher.find());
 
+		logger.info("\t\t\t\tStart Load Parameters");
 		if (!appParameters.isSkipcli())
-			loadInfoList();
+			loadCliInfoList();
 
 		if (appParameters.isAuto()) {
 			AppContext.setNeList(loadNeList());
@@ -143,12 +144,6 @@ public class LoadParameterImpl implements LoadParameter {
 					&& StringUtils.isEmpty(ne.getDbPath())) {
 				System.out.println((errMsg.toString()));
 				return false;
-			}
-
-			if (StringUtils.isEmpty(ne.getDbPath())) {
-				ne.setDbPath(AppContext.getResourceFactory().dataRoot
-						+ ne.getIpAddress() + "/"
-						+ AppContext.getResourceFactory().dbFile);
 			}
 
 			regx = "( -7342epon )|( -7342gpon )|( -7360 )|( -7360l )";
@@ -251,7 +246,7 @@ public class LoadParameterImpl implements LoadParameter {
 			return;
 		}
 
-		String ftpIp = prop.getProperty("ftpIp");
+		String ftpip = prop.getProperty("ftpip");
 		String ftpport = prop.getProperty("ftpport");
 		String ftpuser = prop.getProperty("ftpuser");
 		String ftppwd = prop.getProperty("ftppwd");
@@ -262,9 +257,15 @@ public class LoadParameterImpl implements LoadParameter {
 		String snmpcommunity = prop.getProperty("snmpcommunity");
 		String maxthread = prop.getProperty("maxthread");
 
-		param.setFtpIp(ftpIp);
+		param.setFtpIp(ftpip);
 		param.setFtpUser(ftpuser);
 		param.setFtpPwd(ftppwd);
+		if (StringUtils.isEmpty(ftpdir))
+			ftpdir = "/";
+		if (!ftpdir.startsWith("/"))
+			ftpdir = "/" + ftpdir;
+		if (!ftpdir.endsWith("/"))
+			ftpdir += "/";
 		param.setFtpDir(ftpdir);
 
 		param.setCliUser(cliuser);
@@ -365,7 +366,7 @@ public class LoadParameterImpl implements LoadParameter {
 		}
 	}
 
-	private void loadInfoList() {
+	private void loadCliInfoList() {
 		List<String> infoList = new ArrayList<String>();
 		AppContext.setInfoList(infoList);
 		File file = AppContext.getResourceFactory().getConfigFile(

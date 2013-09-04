@@ -19,16 +19,18 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import com.mars.dbexport.AppContext;
 import com.mars.dbexport.bo.NetworkElement;
 import com.mars.dbexport.service.CliInfoReader;
-import com.mars.dbexport.service.DbConvertor;
 import com.mars.dbexport.service.DbBackup;
+import com.mars.dbexport.service.DbConvertor;
 import com.mars.dbexport.service.batch.BatchManager;
 import com.mars.dbexport.service.batch.BatchResult;
 import com.mars.dbexport.service.impl.CliInfoReaderImpl;
-import com.mars.dbexport.service.impl.DbConvertorImpl;
 import com.mars.dbexport.service.impl.DbBackupImpl;
+import com.mars.dbexport.service.impl.DbConvertorImpl;
 import com.mars.dbexport.utils.FileUtils;
 import com.mars.dbexport.utils.GenericUtils;
 
@@ -66,21 +68,20 @@ public class DbExportTask extends BatchManager {
 		if (ne == null)
 			return result;
 		File db = new File(ne.getDbPath());
-		if (!db.exists()) {
-			DbBackup dbback = new DbBackupImpl();
-			if (!dbback.exportDb(ne)) {
+		if (AppContext.getAppParamters().isAuto() || !db.exists()) {
+			DbBackup dbback = new DbBackupImpl(ne);
+			if (!dbback.exportDb()) {
 				result.setSucceed(false);
-				logger.error(ip + " " + "db backup failed");
 				return result;
 			}
 		}
 		DbConvertor convertor = new DbConvertorImpl(ne);
 		List<String> commands = convertor.genrateCLICommands();
 		if (!AppContext.getAppParamters().isSkipcli()) {
-			commands.add("");
-			CliInfoReader cliReader = new CliInfoReaderImpl();
-			List<String> cliInfos = cliReader.readCliInfo(ne);
-			commands.addAll(cliInfos);
+			CliInfoReader cliReader = new CliInfoReaderImpl(ne);
+			List<String> cliInfos = cliReader.readCliInfo();
+			if (CollectionUtils.isNotEmpty(cliInfos))
+				commands.addAll(cliInfos);
 		}
 		save2file(ip, commands);
 		return result;
@@ -95,7 +96,7 @@ public class DbExportTask extends BatchManager {
 		StringBuilder sb = new StringBuilder();
 		sb.append(dir.getAbsolutePath());
 		sb.append("/");
-		sb.append("CMD");
+		sb.append(neIp + "-");
 		sb.append(GenericUtils.completeString(calendar.get(Calendar.YEAR) + "",
 				4, '0', false));
 		sb.append(GenericUtils.completeString(
@@ -119,8 +120,6 @@ public class DbExportTask extends BatchManager {
 			for (String cmd : cliCommands) {
 				writer.write(cmd + "\r\n");
 			}
-			System.out.println("Convertion complete : "
-					+ file.getAbsolutePath());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

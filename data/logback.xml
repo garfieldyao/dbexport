@@ -1,7 +1,7 @@
 <configuration>
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n
+			<Pattern>%date %level %msg%n
 			</Pattern>
 		</layout>
 	</appender>
@@ -21,7 +21,7 @@
 			<MaxFileSize>1MB</MaxFileSize>
 		</triggeringPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>%date %msg%n
+			<Pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n
 			</Pattern>
 		</layout>
 	</appender>
@@ -41,7 +41,7 @@
 			<MaxFileSize>1MB</MaxFileSize>
 		</triggeringPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>%date %msg%n
+			<Pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n
 			</Pattern>
 		</layout>
 	</appender>
@@ -55,5 +55,5 @@
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="ROLLINGFILE_ERROR" />
 	</logger>
-	
+
 </configuration>

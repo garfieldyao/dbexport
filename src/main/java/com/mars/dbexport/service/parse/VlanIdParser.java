@@ -9,8 +9,10 @@ public class VlanIdParser implements Parser {
 	public String parse(DbData data) {
 		// TODO Auto-generated method stub
 		int index = Integer.parseInt(GenericUtils.parseCommData(data));
-		if (index <= 0)
+		if (index < 0)
 			return "-1";
+		if (index == 0)
+			return "0";
 		int cvlan = index & 4095;
 		int svlan = (index - cvlan) >> 12;
 		StringBuilder sb = new StringBuilder();

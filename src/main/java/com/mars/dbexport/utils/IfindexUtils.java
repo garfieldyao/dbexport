@@ -3,6 +3,9 @@
  */
 package com.mars.dbexport.utils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.mars.dbexport.bo.enums.OltType;
 
 /**
@@ -46,5 +49,24 @@ public class IfindexUtils {
 		sb.append(ont);
 
 		return sb.toString();
+	}
+
+	public static OltType checkOltType(String mibVer) {
+		OltType type = OltType.UNKNOWN;
+		if (mibVer.startsWith("3FE21961")) {
+			String regx = "_V[0-9]+[.][0-9]+";
+			Pattern pat = Pattern.compile(regx);
+			Matcher mat = pat.matcher(mibVer);
+			if (mat.find()) {
+				String group = mat.group();
+				float ver = Float.parseFloat(group.substring(2));
+				if (ver >= 4.4) {
+					type = OltType.FX7360;
+				} else {
+					type = OltType.FX7360L;
+				}
+			}
+		}
+		return type;
 	}
 }

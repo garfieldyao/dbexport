@@ -3,13 +3,10 @@
  */
 package com.mars.dbexport;
 
-import java.util.List;
-
 import com.mars.dbexport.bo.enums.ErrorCode;
 import com.mars.dbexport.gui.AppMainFrame;
 import com.mars.dbexport.service.LoadParameter;
 import com.mars.dbexport.service.batch.BatchManager;
-import com.mars.dbexport.service.batch.BatchResult;
 import com.mars.dbexport.service.batch.batchtask.DbExportTask;
 import com.mars.dbexport.service.impl.LoadParameterImpl;
 import com.mars.dbexport.utils.ClientUtils;
@@ -44,13 +41,7 @@ public class AppLoader {
 		} else {
 			BatchManager manager = new DbExportTask(AppContext.getNeList()
 					.keySet());
-			List<BatchResult> results = manager.execute();
-			for (BatchResult result : results) {
-				System.out.print(result.getIpAddr());
-				System.out.print("\t");
-				System.out.print(result.isSucceed() ? "succeed" : "failed");
-				System.out.println();
-			}
+			manager.execute();
 			System.exit(1);
 		}
 	}

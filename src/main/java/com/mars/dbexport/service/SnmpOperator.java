@@ -459,4 +459,22 @@ public class SnmpOperator {
 		}
 		return binds;
 	}
+
+	public boolean checkOidExist(String oid) {
+		VariableBinding value = null;
+		try {
+			value = getSingleValue(oid);
+		} catch (Exception ex) {
+			return false;
+		}
+
+		return !varableIsNull(value);
+	}
+
+	public boolean varableIsNull(VariableBinding bind) {
+		if (bind == null || bind.getVariable() == null
+				|| "noSuchInstance".equals(bind.getVariable().toString()))
+			return true;
+		return false;
+	}
 }

@@ -1,6 +1,5 @@
 package com.mars.dbexport.service;
 
-import com.mars.dbexport.bo.NetworkElement;
 
 public interface DbBackup {
 	/**
@@ -9,5 +8,5 @@ public interface DbBackup {
 	 * @param ne
 	 * @return
 	 */
-	public boolean exportDb(NetworkElement ne);
+	public boolean exportDb();
 }

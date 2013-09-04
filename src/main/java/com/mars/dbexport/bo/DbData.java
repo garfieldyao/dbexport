@@ -15,6 +15,8 @@ public class DbData implements Comparable<DbData> {
 	private String name = "";
 	private DataType type = DataType.UNDEFINE;
 	private String value = "";
+	private int len = 0;
+	private int offset = 0;
 
 	/**
 	 * @return the name
@@ -75,6 +77,15 @@ public class DbData implements Comparable<DbData> {
 		sb.append(",");
 		sb.append("Type=");
 		sb.append(this.type);
+		sb.append(",");
+		sb.append("Len=");
+		sb.append(this.len);
+		sb.append(",");
+		sb.append("Value=");
+		sb.append(this.value);
+		sb.append(",");
+		sb.append("Offset=");
+		sb.append(this.offset);
 		return sb.toString();
 	}
 
@@ -90,10 +101,9 @@ public class DbData implements Comparable<DbData> {
 			return 0;
 		String v1 = GenericUtils.parseCommData(this);
 		String v2 = GenericUtils.parseCommData(obj);
-		if (type == DataType.UNSIGNED_LONG || type == DataType.UNSIGNED_SHORT
-				|| type == DataType.UNSIGNED_CHAR) {
-			int iv1 = Integer.parseInt(v1);
-			int iv2 = Integer.parseInt(v2);
+		if (type != DataType.STRING && type != DataType.UNDEFINE) {
+			long iv1 = Long.parseLong(v1);
+			long iv2 = Long.parseLong(v2);
 			if (iv1 > iv2)
 				return 1;
 			else if (iv1 < iv2)
@@ -103,5 +113,21 @@ public class DbData implements Comparable<DbData> {
 		}
 
 		return 0;
+	}
+
+	public int getLen() {
+		return len;
+	}
+
+	public void setLen(int len) {
+		this.len = len;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
 	}
 }

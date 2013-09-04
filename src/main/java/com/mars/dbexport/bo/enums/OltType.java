@@ -11,5 +11,5 @@ package com.mars.dbexport.bo.enums;
  */
 
 public enum OltType {
-	GPON7342, EPON7342, FX7360, FX7360L;
+	GPON7342, EPON7342, FX7360, FX7360L, UNKNOWN;
 }
