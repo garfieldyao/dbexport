@@ -20,7 +20,7 @@ public class OntSnParser implements Parser {
 	 * .DbData)
 	 */
 	@Override
-	public String parse(DbData data) {
+	public String parse(DbData data, Object... objects) {
 		// TODO Auto-generated method stub
 		String srcData = data.getValue();
 		String vendor = GenericUtils.parseHex2String(srcData.substring(2, 10));

@@ -21,7 +21,7 @@ import com.mars.dbexport.bo.DbData;
 import com.mars.dbexport.bo.DbEntry;
 import com.mars.dbexport.bo.DbIndex;
 import com.mars.dbexport.bo.enums.DataType;
-import com.mars.dbexport.service.impl.DbConvertorImpl;
+import com.mars.dbexport.service.DbOper;
 import com.mars.dbexport.service.parse.Parser;
 
 /**
@@ -109,21 +109,17 @@ public class GenericUtils {
 	}
 
 	public static String parseRegxData(DbData dbData, String parser) {
-		String srcData = parseCommData(dbData);
-		long value = Long.parseLong(srcData.trim());
-		String regx = "regx:[^: ]*:([(][0-9]+,[0-9]+,[-]?[0-9]+[)])+";
+		if (!parser.startsWith("regx"))
+			return "";
+
+		long value = parseHex2Long(dbData);
+
+		String prefix = parser.substring(parser.indexOf("|") + 1,
+				parser.lastIndexOf("|"));
+		List<int[]> matslist = new ArrayList<int[]>();
+		String regx = "[(][0-9]+,[0-9]+,[-]?[0-9]+[)]";
 		Pattern pat = Pattern.compile(regx);
 		Matcher mat = pat.matcher(parser);
-		if (!mat.matches()) {
-			return "";
-		}
-
-		String prefix = parser.substring(parser.indexOf(":") + 1,
-				parser.lastIndexOf(":"));
-		List<int[]> matslist = new ArrayList<int[]>();
-		regx = "[(][0-9]+,[0-9]+,[-]?[0-9]+[)]";
-		pat = Pattern.compile(regx);
-		mat = pat.matcher(parser);
 		String group;
 		while (mat.find()) {
 			group = mat.group();
@@ -148,6 +144,15 @@ public class GenericUtils {
 		sb.deleteCharAt(sb.length() - 1);
 
 		return sb.toString();
+	}
+
+	public static long parseHex2Long(DbData data) {
+		DataType type = data.getType();
+		if (type != DataType.STRING) {
+			return Long.parseLong(parseCommData(data));
+		} else {
+			return Long.parseLong(data.getValue().substring(2), 16);
+		}
 	}
 
 	public static String parseEnumData(DbData dbData, String parser) {
@@ -196,36 +201,48 @@ public class GenericUtils {
 	}
 
 	public static boolean parserBooleanData(DbData srcData, String parser) {
-		if (!parser.startsWith("bool"))
+		if (!parser.startsWith("bool:"))
 			return false;
-		String regx = "[0-9]+";
+		String regx = "[-]?[0-9]+";
 		Pattern pat = Pattern.compile(regx);
 		Matcher mat = pat.matcher(parser);
-		if (mat.find()) {
+		boolean flag = true;
+		while (mat.find()) {
 			String group = mat.group();
-			int pos = Integer.parseInt(group);
-			int value = Integer.parseInt(parseCommData(srcData));
-			return ((value >> pos) & 1) > 0;
+			boolean reverse = group.startsWith("-");
+			long value = Long.parseLong(parseCommData(srcData));
+			int pos = 0;
+			if (reverse) {
+				pos = Integer.parseInt(group.substring(1));
+				flag &= (((value >> pos) & 1) == 0);
+			} else {
+				pos = Integer.parseInt(group);
+				flag &= (((value >> pos) & 1) > 0);
+			}
 		}
-		return true;
+		return flag;
 	}
 
 	public static void sortDbEntry(CLIAttribute cmd, List<DbEntry> entryList) {
 		if (CollectionUtils.isEmpty(entryList))
 			return;
 		// TODO
-		DbData dbData = entryList.get(0).getDbDatas().get(cmd.getDbAttribute());
-		if (dbData == null)
+		List<String> names = cmd.getIndex().getDbIndex();
+		if (CollectionUtils.isEmpty(names))
 			return;
-		String name = dbData.getName();
+		for (String name : names)
+			sortDbEntry(name, entryList);
+	}
+
+	private static void sortDbEntry(String name, List<DbEntry> tmpList) {
 		DbEntry temp = null;
-		for (int i = entryList.size() - 1; i > 0; --i) {
+		for (int i = tmpList.size() - 1; i > 0; --i) {
 			for (int j = 0; j < i; ++j) {
-				if (entryList.get(j + 1).getDbDatas().get(name)
-						.compareTo(entryList.get(j).getDbDatas().get(name)) < 0) {
-					temp = entryList.get(j);
-					entryList.set(j, entryList.get(j + 1));
-					entryList.set(j + 1, temp);
+				if (tmpList.get(j + 1).getDbDatas().get(name)
+						.compareTo(tmpList.get(j).getDbDatas().get(name)) < 0) {
+					temp = tmpList.get(j);
+					tmpList.set(j, tmpList.get(j + 1));
+					tmpList.set(j + 1, temp);
 				}
 			}
 		}
@@ -234,7 +251,7 @@ public class GenericUtils {
 	public static String parseDataValue(String dbParser, DbData dbData,
 			Object... objs) {
 		String result = "";
-		if (dbParser.startsWith("raw:")) {
+		if (dbParser.startsWith("raw")) {
 			return dbParser.substring(4).trim();
 		} else if (dbParser.startsWith("bool")) {
 			return parserBooleanData(dbData, dbParser) ? "true" : "false";
@@ -256,14 +273,14 @@ public class GenericUtils {
 			}
 
 			result = parser.parse(dbData);
-		} else if (dbParser.startsWith("regx:")) {
+		} else if (dbParser.startsWith("regx")) {
 			// TODO
 			result = GenericUtils.parseRegxData(dbData, dbParser);
-		} else if (dbParser.startsWith("enum:")) {
+		} else if (dbParser.startsWith("enum")) {
 			result = GenericUtils.parseEnumData(dbData, dbParser);
-		} else if (dbParser.startsWith("ref:")) {
+		} else if (dbParser.startsWith("ref")) {
 			result = GenericUtils.parseRefData(dbData, dbParser,
-					(DbConvertorImpl) objs[0]);
+					(DbOper) objs[0]);
 		} else {
 			result = dbData.getValue();
 		}
@@ -271,30 +288,31 @@ public class GenericUtils {
 	}
 
 	public static String parseRefData(DbData dbData, String dbParser,
-			DbConvertorImpl convertor) {
-		String regx = "ref:([^ ]+:[^ ]+:[^ ]+)";
-		Pattern pat = Pattern.compile(regx);
-		Matcher mat = pat.matcher(dbParser);
-		if (!mat.matches())
-			return "NULL";
-		String[] split = dbParser.substring(5, dbParser.length() - 1)
-				.split(":");
+			DbOper oper) {
+		if (!dbParser.startsWith("ref"))
+			return "";
+		String prefix = "";
+		if (dbParser.indexOf("|") < dbParser.lastIndexOf("|"))
+			prefix = dbParser.substring(dbParser.indexOf("|") + 1,
+					dbParser.lastIndexOf("|"));
+		String[] split = dbParser.substring(dbParser.lastIndexOf("|") + 2,
+				dbParser.length() - 1).split(":");
 		String table = split[0];
 		String index = split[1];
 		String name = split[2];
-		List<DbEntry> list = convertor.dbDatas.get(table);
+		List<DbEntry> list = oper.getDbDatas().get(table);
 		if (list == null) {
-			list = convertor.readDbFile(table);
-			convertor.dbDatas.put(table, list);
+			list = oper.readDbFile(table);
+			oper.getDbDatas().put(table, list);
 		}
 
 		for (DbEntry entry : list) {
 			Map<String, DbData> dbDatas = entry.getDbDatas();
 			if (dbData.getValue().equals(dbDatas.get(index).getValue())) {
-				return parseCommData(dbDatas.get(name));
+				return prefix + parseCommData(dbDatas.get(name));
 			}
 		}
-		return "NULL";
+		return "";
 	}
 
 	public static String parseDbEntryIndex(CLIAttribute attr, DbEntry entry) {
@@ -366,18 +384,30 @@ public class GenericUtils {
 			sb.append(hex);
 		}
 		String raw = sb.toString();
-		int sx = 0;
-		for (int idx = 0; idx < raw.length(); idx++) {
-			char car = raw.charAt(idx);
-			if (car != '0')
-				break;
-			sx++;
-		}
-		raw = raw.substring(sx);
+		raw = trimHexString(raw);
 		if (StringUtils.isEmpty(raw))
 			raw = "0";
 
 		return "0x" + raw;
+	}
+
+	public static String trimHexString(String src) {
+		if (StringUtils.isEmpty(src))
+			return "";
+		boolean flag = src.startsWith("0x");
+		if (flag)
+			src = src.substring(2);
+		int sx = 0;
+		for (int idx = 0; idx < src.length(); idx++) {
+			char car = src.charAt(idx);
+			if (car != '0')
+				break;
+			sx++;
+		}
+		src = src.substring(sx);
+		if (flag)
+			src = "0x" + src;
+		return src;
 	}
 
 	// validate IP address
@@ -397,11 +427,6 @@ public class GenericUtils {
 	}
 
 	public static void main(String[] args) {
-		byte[] data = new byte[4];
-		data[0] = 1;
-		data[1] = 2;
-		data[2] = 3;
-		data[3] = -1;
-		System.out.println(bytes2hex(data));
+		System.out.println(trimHexString("000012003"));
 	}
 }

@@ -251,6 +251,7 @@ public class LoadParameterImpl implements LoadParameter {
 		String ftpuser = prop.getProperty("ftpuser");
 		String ftppwd = prop.getProperty("ftppwd");
 		String ftpdir = prop.getProperty("ftpdir");
+		String ftplocal = prop.getProperty("ftplocal");
 
 		String cliuser = prop.getProperty("cliuser");
 		String clipwd = prop.getProperty("clipwd");
@@ -260,6 +261,7 @@ public class LoadParameterImpl implements LoadParameter {
 		param.setFtpIp(ftpip);
 		param.setFtpUser(ftpuser);
 		param.setFtpPwd(ftppwd);
+
 		if (StringUtils.isEmpty(ftpdir))
 			ftpdir = "/";
 		if (!ftpdir.startsWith("/"))
@@ -267,6 +269,12 @@ public class LoadParameterImpl implements LoadParameter {
 		if (!ftpdir.endsWith("/"))
 			ftpdir += "/";
 		param.setFtpDir(ftpdir);
+
+		if (StringUtils.isEmpty(ftplocal))
+			ftplocal = AppContext.getResourceFactory().dataRoot;
+		if (!ftplocal.endsWith("/"))
+			ftplocal += "/";
+		param.setFtpLocal(ftplocal);
 
 		param.setCliUser(cliuser);
 		param.setCliPwd(clipwd);

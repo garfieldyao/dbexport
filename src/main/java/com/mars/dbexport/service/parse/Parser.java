@@ -12,5 +12,5 @@ import com.mars.dbexport.bo.DbData;
  * 
  */
 public interface Parser {
-	public String parse(DbData data);
+	public String parse(DbData data, Object... objects);
 }

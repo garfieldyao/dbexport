@@ -60,5 +60,17 @@ public class FileUtils {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		try {
+			File dir = new File(AppContext.getAppParamters().getFtpLocal()
+					+ ipAddr);
+			if (!dir.exists())
+				dir.mkdirs();
+			if (!dir.isDirectory()) {
+				dir.delete();
+				dir.mkdirs();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }

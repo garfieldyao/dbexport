@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://www.garfield.com/MappingSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.garfield.com/MappingSchema MappingSchema.xsd ">
+	<!-- configure qos interface -->
+	<!-- ONT level QoS -->
+	<mapping>
+		<attributes>
+			<prefix>configure qos</prefix>
+			<miniAttributes>2</miniAttributes>
+			<attribute>
+				<cliname>interface</cliname>
+				<dbTable>QosOnt</dbTable>
+				<dbAttribute>logId</dbAttribute>
+				<index>logId(regx|ont:1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<parser>regx|ont:1/1/|(32,8,-2)(23,9,1)(16,7,1)</parser>
+			</attribute>
+			<attribute>
+				<cliname>scheduler-node</cliname>
+				<dbTable>QosOnt</dbTable>
+				<dbAttribute>scnProf</dbAttribute>
+				<index>logId(regx|ont:1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<parser>ref|name:|(QosScNode:Index:Name)</parser>
+			</attribute>
+			<attribute>
+				<cliname>ds-queue-sharing</cliname>
+				<dbTable>QosOnt</dbTable>
+				<dbAttribute>dsQShar</dbAttribute>
+				<index>logId(regx|ont:1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<parser>bool:0</parser>
+				<novalue>true</novalue>
+			</attribute>
+			<attribute>
+				<cliname>us-queue-sharing</cliname>
+				<dbTable>QosOnt</dbTable>
+				<dbAttribute>usQShar</dbAttribute>
+				<index>logId(regx|ont:1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<parser>bool:0</parser>
+				<novalue>true</novalue>
+			</attribute>
+			<attribute>
+				<cliname>ds-num-rem-queue</cliname>
+				<dbTable>QosOnt</dbTable>
+				<dbAttribute>dsNumRQ</dbAttribute>
+				<index>logId(regx|ont:1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<parser>auto:(0x0,not-applicable)</parser>
+				<default>not-applicable</default>
+			</attribute>
+			<attribute>
+				<cliname>us-num-queue</cliname>
+				<dbTable>QosOnt</dbTable>
+				<dbAttribute>usNumQ</dbAttribute>
+				<index>logId(regx|ont:1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<default>8</default>
+			</attribute>
+			<attribute>
+				<cliname>us-vlanport-queue</cliname>
+				<dbTable>QosOnt</dbTable>
+				<dbAttribute>vpQEn</dbAttribute>
+				<index>logId(regx|ont:1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<parser>bool:0</parser>
+				<novalue>true</novalue>
+			</attribute>
+		</attributes>
+	</mapping>
+
+	<!-- UNI level QoS -->
+	<mapping>
+		<attributes>
+			<prefix>configure qos</prefix>
+			<miniAttributes>2</miniAttributes>
+			<attribute>
+				<cliname>interface</cliname>
+				<dbTable>QosUni</dbTable>
+				<dbAttribute>logId</dbAttribute>
+				<index>logId(regx|1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<parser>xref|1/1/|(32,8,-2)(23,9,1)(16,7,1)</parser>
+			</attribute>
+			<attribute>
+				<cliname>scheduler-node</cliname>
+				<dbTable>QosUni</dbTable>
+				<dbAttribute>scnProf</dbAttribute>
+				<index>logId(regx|1/1/|(32,8,-2)(23,9,1)(16,7,1))</index>
+				<parser>ref|name:|(QosScNode:Index:Name)</parser>
+			</attribute>
+		</attributes>
+	</mapping>
+</mappings>

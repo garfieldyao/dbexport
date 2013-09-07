@@ -99,20 +99,14 @@ public class DbData implements Comparable<DbData> {
 		// TODO Auto-generated method stub
 		if (this.type != obj.type)
 			return 0;
-		String v1 = GenericUtils.parseCommData(this);
-		String v2 = GenericUtils.parseCommData(obj);
-		if (type != DataType.STRING && type != DataType.UNDEFINE) {
-			long iv1 = Long.parseLong(v1);
-			long iv2 = Long.parseLong(v2);
-			if (iv1 > iv2)
-				return 1;
-			else if (iv1 < iv2)
-				return -1;
-			else
-				return 0;
-		}
-
-		return 0;
+		long v1 = GenericUtils.parseHex2Long(this);
+		long v2 = GenericUtils.parseHex2Long(obj);
+		if (v1 > v2)
+			return 1;
+		else if (v1 < v2)
+			return -1;
+		else
+			return 0;
 	}
 
 	public int getLen() {

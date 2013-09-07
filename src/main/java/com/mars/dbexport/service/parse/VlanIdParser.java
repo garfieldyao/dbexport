@@ -6,7 +6,7 @@ import com.mars.dbexport.utils.GenericUtils;
 public class VlanIdParser implements Parser {
 
 	@Override
-	public String parse(DbData data) {
+	public String parse(DbData data, Object... objects) {
 		// TODO Auto-generated method stub
 		int index = Integer.parseInt(GenericUtils.parseCommData(data));
 		if (index < 0)

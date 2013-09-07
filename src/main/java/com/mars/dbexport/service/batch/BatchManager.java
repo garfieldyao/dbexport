@@ -79,6 +79,7 @@ public abstract class BatchManager {
 							logger.info(result.getIpAddr() + "\t\tFailed");
 						}
 					} catch (Exception ex) {
+						logger.error(ex.getLocalizedMessage());
 					}
 					tasklist.remove(task);
 					break;

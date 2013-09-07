@@ -3,7 +3,6 @@
  */
 package com.mars.dbexport.bo;
 
-
 /**
  * @author Yao Liqiang
  * @data Aug 5, 2013
@@ -24,7 +23,8 @@ public class AppParamters {
 	private String ftpUser = "user";
 	private String ftpPwd = "user";
 	private int ftpPort = 21;
-	public String ftpDir = "dm_complete.tar";
+	public String ftpDir = "";
+	private String ftpLocal = "";
 
 	private String community = "public";
 	private String cliUser = "isadmin";
@@ -190,6 +190,8 @@ public class AppParamters {
 		sb.append(ftpPort);
 		sb.append(" ftpDir=");
 		sb.append(ftpDir);
+		sb.append(" ftpLocal=");
+		sb.append(ftpLocal);
 		sb.append(" ftpIp=");
 		sb.append(ftpIp);
 		sb.append(" community=");
@@ -209,5 +211,13 @@ public class AppParamters {
 
 	public void setCliPort(int cliPort) {
 		this.cliPort = cliPort;
+	}
+
+	public String getFtpLocal() {
+		return ftpLocal;
+	}
+
+	public void setFtpLocal(String ftpLocal) {
+		this.ftpLocal = ftpLocal;
 	}
 }

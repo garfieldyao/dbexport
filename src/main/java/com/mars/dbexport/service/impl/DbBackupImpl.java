@@ -38,7 +38,7 @@ public class DbBackupImpl implements DbBackup {
 		ne.setType(type);
 		if (!configFtpServer())
 			return false;
-		File file = new File(AppContext.getResourceFactory().dataRoot + "/"
+		File file = new File(AppContext.getAppParamters().getFtpLocal()
 				+ ne.getIpAddress() + "/"
 				+ AppContext.getResourceFactory().dbFile);
 		if (file.exists())

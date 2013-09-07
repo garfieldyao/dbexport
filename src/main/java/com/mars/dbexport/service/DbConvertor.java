@@ -11,7 +11,8 @@ import java.util.List;
  */
 public interface DbConvertor {
 	/**
-	 * Invoke migration tools, had been relaced by java native code
+	 * Java native code will be used to read database binary file instead of
+	 * invoke migation tool
 	 * 
 	 * @deprecated
 	 * @param filePath

@@ -20,7 +20,7 @@ public class OntIfindexParser implements Parser {
 	 * @see com.mars.dbexporter.task.parse.parser#parse(java.lang.Object)
 	 */
 	@Override
-	public String parse(DbData data) {
+	public String parse(DbData data, Object... objects) {
 		// TODO Auto-generated method stub
 		String result = "";
 		try {
