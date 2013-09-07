@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -56,6 +58,7 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 	private Map<String, List<DbEntry>> dbDatas = new HashMap<String, List<DbEntry>>();
 	private int milestone = 0;
 	private TarArchiveInputStream taris = null;
+	private Set<String> sortTables = new HashSet<String>();
 
 	public DbConvertorImpl(NetworkElement ne) {
 		this.ne = ne;
@@ -89,12 +92,9 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 			// sort
 			for (CLIAttribute tmpattr : attributes) {
 				String tbName = tmpattr.getDbTable();
-				List<DbEntry> entryList = getDbDatas().get(tbName);
-				if (entryList == null) {
-					entryList = readDbFile(tbName);
+				List<DbEntry> entryList = getDbTable(tbName);
+				if (!sortTables.contains(tbName))
 					GenericUtils.sortDbEntry(tmpattr, entryList);
-					getDbDatas().put(tbName, entryList);
-				}
 			}
 
 			List<DbEntry> indexList = new ArrayList<DbEntry>();
@@ -202,7 +202,6 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 		return commands;
 	}
 
-	@Override
 	public List<DbEntry> readDbFile(String tableName) {
 		List<DbEntry> datas = new ArrayList<DbEntry>();
 		// TODO
@@ -519,8 +518,18 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 		return datas;
 	}
 
-	@Override
 	public Map<String, List<DbEntry>> getDbDatas() {
 		return dbDatas;
+	}
+
+	@Override
+	public List<DbEntry> getDbTable(String tableName) {
+		// TODO Auto-generated method stub
+		List<DbEntry> list = getDbDatas().get(tableName);
+		if (list == null) {
+			list = readDbFile(tableName);
+			getDbDatas().put(tableName, list);
+		}
+		return list;
 	}
 }
