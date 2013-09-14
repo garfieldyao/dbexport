@@ -52,6 +52,7 @@ public abstract class BatchManager {
 								result = runTask(ip);
 							} catch (Exception ex) {
 								result.setException(ex);
+								ex.printStackTrace();
 							}
 							result.setIpAddr(ip);
 							return result;

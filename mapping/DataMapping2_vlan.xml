@@ -11,27 +11,27 @@
 				<cliname>id</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vlanId</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>class:com.mars.dbexport.service.parse.VlanIdParser</parser>
 			</attribute>
 			<attribute>
 				<cliname>mode</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vSysMod</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x10000,cross-connect)(0x20000,residential-bridge)(0x30000,qos-aware)(0x40000,layer2-terminated)(0x70000,mirror)</parser>
 			</attribute>
 			<attribute>
 				<cliname>name</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vStaNm</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 			</attribute>
 			<attribute>
 				<cliname>sntp-proxy</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>sntpPxy</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -39,7 +39,7 @@
 				<cliname>priority</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vStaPri</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>reverse</parser>
 				<default>0</default>
 			</attribute>
@@ -47,7 +47,7 @@
 				<cliname>vmac-not-in-opt61</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>macOp61</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -55,7 +55,7 @@
 				<cliname>new-broadcast</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vlanBcC</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x3,enable)(0x4,disable)(0x5,inherit)</parser>
 				<default>inherit</default>
 			</attribute>
@@ -63,7 +63,7 @@
 				<cliname>protocol-filter</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vGrouId</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x30,pass-all)(0x31,pass-pppoe)(0x32,pass-ipoe)(0x33,pass-pppoe-ipoe)(0x34,pass-ipv6oe)(0x35,pass-pppoe-ipv6oe)(0x36,pass-ipoe-ipv6oe)(0x37,pass-pppoe-ipoe-ipv6oe)</parser>
 				<default>pass-all</default>
 			</attribute>
@@ -71,7 +71,7 @@
 				<cliname>pppoe-relay-tag</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>AdReTag</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,true)(0x2,false)(0x3,configurable)</parser>
 				<default>false</default>
 			</attribute>
@@ -79,7 +79,7 @@
 				<cliname>new-secure-fwd</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vSecFwd</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x3,enable)(0x4,disable)(0x5,inherit)</parser>
 				<default>inherit</default>
 			</attribute>
@@ -87,14 +87,14 @@
 				<cliname>aging-time</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>macAgTm</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<default>4294967295</default>
 			</attribute>
 			<attribute>
 				<cliname>l2cp-transparent</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>l2cpTra</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -102,7 +102,7 @@
 				<cliname>in-qos-prof-name</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>InQosTc</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>ref|(QosInProf:Index:Name)</parser>
 				<default>Ingress_Default</default>
 			</attribute>
@@ -110,7 +110,7 @@
 				<cliname>ipv4-mcast-ctrl</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>IPv4McC</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -118,7 +118,7 @@
 				<cliname>ipv6-mcast-ctrl</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>IPv6McC</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -126,7 +126,7 @@
 				<cliname>mac-mcast-ctrl</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>MacMcC</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -134,7 +134,7 @@
 				<cliname>dis-proto-rip</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>ProtCtl</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:-0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -142,7 +142,7 @@
 				<cliname>proto-ntp</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>ProtCtl</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:1</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -150,7 +150,7 @@
 				<cliname>dis-ip-antispoof</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>ipAnti</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -158,7 +158,7 @@
 				<cliname>unknown-unicast</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>uniFld</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -166,7 +166,7 @@
 				<cliname>mac-movement-ctrl</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>macMove</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -181,14 +181,14 @@
 				<cliname>id</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vlanId</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>class:com.mars.dbexport.service.parse.VlanIdParser</parser>
 			</attribute>
 			<attribute>
 				<cliname>vmac-translation</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vMacEna</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -196,7 +196,7 @@
 				<cliname>vmac-dnstr-filter</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>vMacBlo</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -204,7 +204,7 @@
 				<cliname>dhcp-opt-82</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>Opt82</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>
@@ -212,7 +212,7 @@
 				<cliname>circuit-id-dhcp</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>circuit</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,disable)(0x2,customer-id)(0x3,physical-id)(0x4,ccsa-format)</parser>
 				<default>disable</default>
 			</attribute>
@@ -220,7 +220,7 @@
 				<cliname>remote-id-dhcp</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>remote</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,disable)(0x2,customer-id)(0x3,physical-id)</parser>
 				<default>disable</default>
 			</attribute>
@@ -228,7 +228,7 @@
 				<cliname>dhcp-linerate</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>dhcpLnR</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,notadd)(0x2,addactuallinerate)(0x3,addalllineparameters)</parser>
 				<default>notadd</default>
 			</attribute>
@@ -236,7 +236,7 @@
 				<cliname>pppoe-linerate</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>pppoeLR</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,notadd)(0x2,addactuallinerate)(0x3,addalllineparameters)</parser>
 				<default>notadd</default>
 			</attribute>
@@ -244,7 +244,7 @@
 				<cliname>dhcpv6-linerate</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>dhcp6LR</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,notadd)(0x2,addalllineparameters)</parser>
 				<default>notadd</default>
 			</attribute>
@@ -252,7 +252,7 @@
 				<cliname>circuit-id-pppoe</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>ctPppoe</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,disable)(0x2,customer-id)(0x3,physical-id)(0x4,ccsa-format)</parser>
 				<default>disable</default>
 			</attribute>
@@ -260,7 +260,7 @@
 				<cliname>remote-id-pppoe</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>rtPppoe</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,disable)(0x2,customer-id)(0x3,physical-id)</parser>
 				<default>disable</default>
 			</attribute>
@@ -268,7 +268,7 @@
 				<cliname>dhcpv6-itf-id</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>v6ItfId</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,disable)(0x2,customer-id)(0x3,physical-id)(0x4,ccsa-format)</parser>
 				<default>disable</default>
 			</attribute>
@@ -276,7 +276,7 @@
 				<cliname>dhcpv6-remote-id</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>v6RmtId</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,disable)(0x2,customer-id)(0x3,physical-id)</parser>
 				<default>disable</default>
 			</attribute>
@@ -284,7 +284,7 @@
 				<cliname>dhcpv6-trst-port</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>v6TrPrt</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>enum:(0x1,trusted)(0x2,untrusted)</parser>
 				<default>untrusted</default>
 			</attribute>
@@ -292,14 +292,14 @@
 				<cliname>enterprise-number</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>v6EntNb</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<default>3561</default>
 			</attribute>
 			<attribute>
 				<cliname>icmpv6-sec-fltr</cliname>
 				<dbTable>vlanStaTbl</dbTable>
 				<dbAttribute>v6SecFt</dbAttribute>
-				<index>vlanId(class:com.mars.dbexport.service.parse.VlanIdParser)</index>
+				<index>vlanId</index>
 				<parser>bool:0</parser>
 				<novalue>true</novalue>
 			</attribute>

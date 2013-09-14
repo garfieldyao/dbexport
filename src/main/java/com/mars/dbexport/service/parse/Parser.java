@@ -4,6 +4,8 @@
 package com.mars.dbexport.service.parse;
 
 import com.mars.dbexport.bo.DbData;
+import com.mars.dbexport.bo.DbEntry;
+import com.mars.dbexport.service.DbOper;
 
 /**
  * @author Yao
@@ -12,5 +14,5 @@ import com.mars.dbexport.bo.DbData;
  * 
  */
 public interface Parser {
-	public String parse(DbData data, Object... objects);
+	public String parse(DbData data, DbOper dbOper, DbEntry dbEntry);
 }

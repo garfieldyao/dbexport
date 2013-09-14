@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -42,8 +44,8 @@ public class PlatformUtils {
 	}
 
 	/**
-	 * This application only support one instance simutaneously 
-	 * A file locker will be set up when app start
+	 * This application only support one instance simutaneously A file locker
+	 * will be set up when app start
 	 * 
 	 * @return
 	 */
@@ -70,10 +72,26 @@ public class PlatformUtils {
 		if (file.isFile()) {
 			file.delete();
 		} else if (file.isDirectory()) {
-			for(File tmpfile : file.listFiles()){
+			for (File tmpfile : file.listFiles()) {
 				removeFile(tmpfile);
 			}
 			file.delete();
 		}
+	}
+
+	// validate IP address
+	public static boolean isValidAddress(String ip) {
+		String regx = "[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+";
+		Pattern pat = Pattern.compile(regx);
+		Matcher mat = pat.matcher(ip);
+		if (!mat.matches())
+			return false;
+		String[] split = ip.split(".");
+		for (String str : split) {
+			int value = Integer.parseInt(str);
+			if (value < 0 || value > 255)
+				return false;
+		}
+		return true;
 	}
 }

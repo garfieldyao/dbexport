@@ -4,6 +4,8 @@
 package com.mars.dbexport.service.parse;
 
 import com.mars.dbexport.bo.DbData;
+import com.mars.dbexport.bo.DbEntry;
+import com.mars.dbexport.service.DbOper;
 import com.mars.dbexport.utils.GenericUtils;
 
 /**
@@ -20,7 +22,7 @@ public class OntSnParser implements Parser {
 	 * .DbData)
 	 */
 	@Override
-	public String parse(DbData data, Object... objects) {
+	public String parse(DbData data, DbOper dbOper, DbEntry dbEntry) {
 		// TODO Auto-generated method stub
 		String srcData = data.getValue();
 		String vendor = GenericUtils.parseHex2String(srcData.substring(2, 10));

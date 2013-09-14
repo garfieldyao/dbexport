@@ -15,6 +15,7 @@ public class CLICommand {
 	private String prex = "";
 	private int miniAttributes = 0;
 	private List<CLIAttribute> attributes = new ArrayList<CLIAttribute>();
+	private String sortor = "";
 	/**
 	 * @return the prex
 	 */
@@ -50,6 +51,12 @@ public class CLICommand {
 	 */
 	public void setMiniAttributes(int miniAttributes) {
 		this.miniAttributes = miniAttributes;
+	}
+	public String getSortor() {
+		return sortor;
+	}
+	public void setSortor(String sortor) {
+		this.sortor = sortor;
 	}
 	
 	

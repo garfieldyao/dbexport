@@ -1,6 +1,7 @@
 package com.mars.dbexport.bo.prv;
 
 public class IndexMatcher {
+	private String rawAttr = "";
 	private int rawStart = 0;
 	private int rawLen = 0;
 	private String targetAttr = "";
@@ -45,5 +46,13 @@ public class IndexMatcher {
 
 	public void setTargetLen(int targetLen) {
 		this.targetLen = targetLen;
+	}
+
+	public String getRawAttr() {
+		return rawAttr;
+	}
+
+	public void setRawAttr(String rawAttr) {
+		this.rawAttr = rawAttr;
 	}
 }

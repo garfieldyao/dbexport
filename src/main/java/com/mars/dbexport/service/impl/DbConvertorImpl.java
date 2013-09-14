@@ -40,6 +40,7 @@ import com.mars.dbexport.bo.enums.OsType;
 import com.mars.dbexport.service.DbConvertor;
 import com.mars.dbexport.service.DbOper;
 import com.mars.dbexport.service.LogFactory;
+import com.mars.dbexport.service.sortor.Sortor;
 import com.mars.dbexport.utils.GenericUtils;
 import com.mars.dbexport.utils.PlatformUtils;
 
@@ -71,12 +72,12 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 	 */
 	@Override
 	public List<String> genrateCLICommands() {
-		// TODO Auto-generated method stub
 		logger.info(ne.getIpAddress() + "\t\tStart Convert database file\t"
 				+ ne.getDbPath());
 		List<String> commands = new ArrayList<String>();
 		String lastprefix = "";
 		for (CLICommand comm : AppContext.getCliCommands()) {
+			List<String> tmpcomds = new ArrayList<String>();
 			List<CLIAttribute> attributes = comm.getAttributes();
 			if (CollectionUtils.isEmpty(attributes))
 				continue;
@@ -119,11 +120,13 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 							|| StringUtils.isEmpty(attr.getParser()))
 						continue;
 					DbData dbData = null;
+					DbEntry dbEntry = null;
 					if (attr.getDbTable().equals(indexattr.getDbTable())) {
-						dbData = getDbDatas().get(attr.getDbTable()).get(idex)
-								.getDbDatas().get(attr.getDbAttribute());
+						// Always jump into this branch
+						dbEntry = getDbDatas().get(attr.getDbTable()).get(idex);
+						dbData = dbEntry.getDbDatas()
+								.get(attr.getDbAttribute());
 					} else {
-						// TODO
 						DbEntry tmpIndexEntry = indexList.get(idex);
 						String tmpDbEntryIndex = GenericUtils
 								.parseDbEntryIndex(indexattr, tmpIndexEntry);
@@ -132,6 +135,7 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 							if (GenericUtils
 									.parseDbEntryIndex(attr, tmpDbEntry)
 									.equals(tmpDbEntryIndex)) {
+								dbEntry = tmpDbEntry;
 								dbData = tmpDbEntry.getDbDatas().get(
 										attr.getDbAttribute());
 								break;
@@ -139,14 +143,23 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 						}
 					}
 
+					if (dbData == null) {
+						if (AppContext.debug)
+							System.out
+									.println(attr.getCliName() + " not exist");
+						continue;
+					}
+
 					if (AppContext.debug) {
 						System.out.println(dbData.toString());
 					}
+
 					String dataValue = GenericUtils.parseDataValue(
-							attr.getParser(), dbData, this);
+							attr.getParser(), dbData, this, dbEntry);
 					if (!AppContext.getAppParamters().isNofilter()) {
 						if (attr.getDefaultValue() != null) {
-							if (attr.getDefaultValue().equals(dataValue))
+							if (GenericUtils.isDefaultValue(dataValue,
+									attr.getDefaultValue(), this, dbEntry))
 								continue;
 						}
 					}
@@ -180,23 +193,33 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 					count++;
 				}
 
-				boolean trace = AppContext.getAppParamters().isTrace();
 				if (AppContext.getAppParamters().isNofilter()
 						|| count >= comm.getMiniAttributes()) {
 					String cmd = sb.toString().trim();
 					if (!comm.getPrex().equals(lastprefix)) {
 						if (!"".equals(lastprefix)) {
-							commands.add("");
-							if (trace)
-								System.out.println();
+							tmpcomds.add("");
 						}
 						lastprefix = comm.getPrex();
 					}
-					commands.add(cmd);
-					if (trace)
-						System.out.println(cmd);
+					tmpcomds.add(cmd);
 				}
 			}
+
+			if (StringUtils.isNotEmpty(comm.getSortor())) {
+				try {
+					Sortor sortor = (Sortor) Class.forName(comm.getSortor())
+							.newInstance();
+					sortor.sort(tmpcomds);
+				} catch (Exception e) {
+
+				}
+			}
+			if (AppContext.getAppParamters().isTrace()) {
+				for (String outcmd : tmpcomds)
+					System.out.println(outcmd);
+			}
+			commands.addAll(tmpcomds);
 		}
 		logger.info(ne.getIpAddress() + "\t\tConvert database file finished");
 		return commands;
@@ -204,7 +227,6 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 
 	public List<DbEntry> readDbFile(String tableName) {
 		List<DbEntry> datas = new ArrayList<DbEntry>();
-		// TODO
 		File file = new File(ne.getDbPath());
 		FileInputStream fis = null;
 		BufferedInputStream bfin = null;
@@ -333,19 +355,16 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 			try {
 				fis.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
 				bfin.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
 				taris.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -512,7 +531,6 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 			}
 
 		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return datas;
@@ -524,7 +542,6 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 
 	@Override
 	public List<DbEntry> getDbTable(String tableName) {
-		// TODO Auto-generated method stub
 		List<DbEntry> list = getDbDatas().get(tableName);
 		if (list == null) {
 			list = readDbFile(tableName);

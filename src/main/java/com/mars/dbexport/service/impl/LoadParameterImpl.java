@@ -312,11 +312,15 @@ public class LoadParameterImpl implements LoadParameter {
 							continue;
 						Element miniAttributesN = mappingRule
 								.element("miniAttributes");
+						Element sortN = mappingRule.element("sortor");
 						CLICommand command = new CLICommand();
 						command.setPrex(prefixN.getTextTrim());
 						if (miniAttributesN != null) {
 							command.setMiniAttributes(Integer
 									.parseInt(miniAttributesN.getTextTrim()));
+						}
+						if (sortN != null) {
+							command.setSortor(sortN.getTextTrim());
 						}
 						List<CLIAttribute> cliattrs = new ArrayList<CLIAttribute>();
 						command.setAttributes(cliattrs);
@@ -351,13 +355,19 @@ public class LoadParameterImpl implements LoadParameter {
 											.split(";");
 									for (String tmpix : split) {
 										tmpix = tmpix.trim();
-										dbIndex.getDbIndex().add(
-												tmpix.substring(0,
-														tmpix.indexOf("(")));
-										dbIndex.getDbIndexParser().add(
-												tmpix.substring(
-														tmpix.indexOf("(") + 1,
-														tmpix.length() - 1));
+										if (!tmpix.contains("(")) {
+											dbIndex.getDbIndex().add(tmpix);
+											dbIndex.getDbIndexParser().add(
+													"auto");
+										} else {
+											dbIndex.getDbIndex()
+													.add(tmpix.substring(0,
+															tmpix.indexOf("(")));
+											dbIndex.getDbIndexParser()
+													.add(tmpix.substring(
+															tmpix.indexOf("(") + 1,
+															tmpix.length() - 1));
+										}
 									}
 								}
 								if (novalueN != null)

@@ -1,5 +1,7 @@
 package com.mars.dbexport.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -41,8 +43,66 @@ public class FormularParser {
 		return 0x80000000;
 	}
 
+	public static int findNearPair(String src, int local) {
+		if (src.length() <= local)
+			return -1;
+		char sc = src.charAt(local);
+		char ec = 0;
+		if (sc == '(') {
+			ec = ')';
+		} else if (sc == '[') {
+			ec = ']';
+		} else if (sc == '{') {
+			ec = '}';
+		} else {
+			return -1;
+		}
+
+		int cs = 0;
+		int ce = 0;
+		int idx = 0;
+		boolean find = false;
+		for (idx = local; idx < src.length(); idx++) {
+			char tc = src.charAt(idx);
+			if (tc == sc) {
+				cs++;
+			} else if (tc == ec) {
+				ce++;
+			}
+
+			if (cs == ce) {
+				find = true;
+				break;
+			}
+		}
+
+		return find ? idx : -1;
+	}
+
+	public static String findNearPairString(String src, int local) {
+		int pair = findNearPair(src, local);
+		return pair > 0 ? src.substring(local + 1, pair) : "";
+	}
+
+	public static List<String> findPairs(String src) {
+		List<String> pairs = new ArrayList<String>();
+		int sc = 0;
+		int fc = -1;
+		while (true) {
+			fc = findNearPair(src, sc);
+			if (fc < 0)
+				break;
+			pairs.add(src.substring(sc + 1, fc));
+			sc = fc + 1;
+		}
+		return pairs;
+	}
+
 	public static void main(String[] args) {
-		int i = 0x80000000;
-		System.out.println(i);
+		String str = "(1{22}23)(4[111]56)(78(99))";
+		List<String> pairs = findPairs(str);
+		for(String pa : pairs){
+			System.out.println(pa);
+		}
 	}
 }

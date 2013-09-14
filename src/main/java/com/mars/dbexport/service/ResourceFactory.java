@@ -7,6 +7,8 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.mars.dbexport.AppContext;
 
@@ -30,7 +32,6 @@ public class ResourceFactory {
 	@Deprecated
 	public final String dbDataRoot = "data/xml/data/";
 	public final String mappingRoot = "mapping/";
-	public final String mappingFilePrefix = "datamapping";
 	public final String configFile = "config.ini";
 	public final String neFile = "nelist.xml";
 	public final String infoFile = "cli.ini";
@@ -70,16 +71,39 @@ public class ResourceFactory {
 		return getFile(dbDataRoot, fileName);
 	}
 
+	/**
+	 * File name datamapping + num + type , and sorted by num
+	 * 
+	 * @return
+	 */
 	public List<File> getMappingFiles() {
 		List<File> files = new ArrayList<File>();
 		File mappingDir = getFile(mappingRoot, "");
+		String regx = "DataMapping[0-9]+[_][a-zA-Z0-9]+[.]xml";
+		Pattern pat = Pattern.compile(regx);
+		Matcher mat = null;
 		if (mappingDir != null && mappingDir.isDirectory()) {
 			for (File tmp : mappingDir.listFiles()) {
-				// TODO sort
-				if (tmp.isFile()
-						&& tmp.getName().toLowerCase()
-								.startsWith(mappingFilePrefix))
+				if (!tmp.isFile())
+					continue;
+				mat = pat.matcher(tmp.getName());
+				if (mat.matches())
 					files.add(tmp);
+			}
+		}
+
+		File temp = null;
+		for (int i = files.size() - 1; i > 0; --i) {
+			for (int j = 0; j < i; ++j) {
+				String fileName1 = files.get(j).getName();
+				String fileName2 = files.get(j + 1).getName();
+				if (Integer.parseInt(fileName1.substring(11,
+						fileName1.indexOf("_"))) > Integer.parseInt(fileName2
+						.substring(11, fileName2.indexOf("_")))) {
+					temp = files.get(j);
+					files.set(j, files.get(j + 1));
+					files.set(j + 1, temp);
+				}
 			}
 		}
 
