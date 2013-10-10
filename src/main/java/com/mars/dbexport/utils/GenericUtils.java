@@ -35,6 +35,7 @@ public class GenericUtils {
 			Object... objs) {
 		if (dbData == null)
 			return "";
+
 		String result = dbData.getValue();
 		if (dbParser.startsWith("raw:")) {
 			return dbParser.substring(4);
@@ -98,7 +99,7 @@ public class GenericUtils {
 		}
 
 		if (type == DataType.STRING) {
-			return parseHex2String(value);
+			return parseHex2String(trimHexString(value));
 		} else if (type == DataType.UNSIGNED_LONG || type == DataType.LONG) {
 			return Long.parseLong(value, 16) + "";
 		} else {
@@ -387,72 +388,80 @@ public class GenericUtils {
 			return "";
 		}
 
-		DbEntry target = null;
-		if (!local) {
-			List<DbEntry> dbTable = dbOper.getDbTable(table);
-			if (CollectionUtils.isEmpty(dbTable))
-				return "";
-			String regx = "[(][^()]+[)]";
-			Pattern pat = Pattern.compile(regx);
-			Matcher mat = null;
-			List<IndexMatcher> indexMats = new ArrayList<IndexMatcher>();
-			mat = pat.matcher(matspart);
-			while (mat.find()) {
-				String group = mat.group();
-				group = group.substring(1, group.length() - 1);
-				String[] tmpSplit = group.split(":");
-				if (tmpSplit.length != 2)
-					return "";
-				String[] tmpSplit1 = tmpSplit[0].split(",");
-				String[] tmpSplit2 = tmpSplit[1].split(",");
-				if (tmpSplit1.length != 3 || tmpSplit2.length != 3)
-					return "";
-				IndexMatcher matcher = new IndexMatcher();
-				matcher.setRawAttr(tmpSplit1[0]);
-				matcher.setRawStart(Integer.parseInt(tmpSplit1[1]));
-				matcher.setRawLen(Integer.parseInt(tmpSplit1[2]));
-				matcher.setTargetAttr(tmpSplit2[0]);
-				matcher.setTargetStart(Integer.parseInt(tmpSplit2[1]));
-				matcher.setTargetLen(Integer.parseInt(tmpSplit2[2]));
-				indexMats.add(matcher);
-			}
+		boolean isNull = false;
 
-			for (DbEntry entry : dbTable) {
-				boolean flag = true;
-				for (IndexMatcher imat : indexMats) {
-					DbData targetdata = entry.getDbDatas().get(
-							imat.getTargetAttr());
-					DbData rawdata = dbEntry.getDbDatas()
-							.get(imat.getRawAttr());
-					String targetdatavalue = completeHexString(
-							targetdata.getValue(),
-							imat.getTargetStart() + imat.getTargetLen());
-					String rawdatavalue = completeHexString(rawdata.getValue(),
-							imat.getRawStart() + imat.getRawLen());
-					String sb1 = rawdatavalue.substring(imat.getRawStart(),
-							imat.getRawStart() + imat.getRawLen());
-					String sb2 = targetdatavalue.substring(
-							imat.getTargetStart(),
-							imat.getTargetStart() + imat.getTargetLen());
-					flag &= sb1.equals(sb2);
+		DbEntry target = null;
+		if (!isNull) {
+			if (!local) {
+				List<DbEntry> dbTable = dbOper.getDbTable(table);
+				if (CollectionUtils.isEmpty(dbTable))
+					isNull = true;
+
+				String regx = "[(][^()]+[)]";
+				Pattern pat = Pattern.compile(regx);
+				Matcher mat = null;
+				List<IndexMatcher> indexMats = new ArrayList<IndexMatcher>();
+				mat = pat.matcher(matspart);
+				while (mat.find()) {
+					String group = mat.group();
+					group = group.substring(1, group.length() - 1);
+					String[] tmpSplit = group.split(":");
+					if (tmpSplit.length != 2)
+						return "";
+					String[] tmpSplit1 = tmpSplit[0].split(",");
+					String[] tmpSplit2 = tmpSplit[1].split(",");
+					if (tmpSplit1.length != 3 || tmpSplit2.length != 3)
+						return "";
+					IndexMatcher matcher = new IndexMatcher();
+					matcher.setRawAttr(tmpSplit1[0]);
+					matcher.setRawStart(Integer.parseInt(tmpSplit1[1]));
+					matcher.setRawLen(Integer.parseInt(tmpSplit1[2]));
+					matcher.setTargetAttr(tmpSplit2[0]);
+					matcher.setTargetStart(Integer.parseInt(tmpSplit2[1]));
+					matcher.setTargetLen(Integer.parseInt(tmpSplit2[2]));
+					indexMats.add(matcher);
 				}
-				if (flag) {
-					target = entry;
-					break;
+
+				for (DbEntry entry : dbTable) {
+					boolean flag = true;
+					for (IndexMatcher imat : indexMats) {
+						DbData targetdata = entry.getDbDatas().get(
+								imat.getTargetAttr());
+						DbData rawdata = dbEntry.getDbDatas().get(
+								imat.getRawAttr());
+						String targetdatavalue = completeHexString(
+								targetdata.getValue(), imat.getTargetStart()
+										+ imat.getTargetLen());
+						String rawdatavalue = completeHexString(
+								rawdata.getValue(),
+								imat.getRawStart() + imat.getRawLen());
+						String sb1 = rawdatavalue.substring(imat.getRawStart(),
+								imat.getRawStart() + imat.getRawLen());
+						String sb2 = targetdatavalue.substring(
+								imat.getTargetStart(), imat.getTargetStart()
+										+ imat.getTargetLen());
+						flag &= sb1.equals(sb2);
+					}
+					if (flag) {
+						target = entry;
+						break;
+					}
 				}
+			}
+			if (target == null) {
+				isNull = true;
 			}
 		} else {
 			target = dbEntry;
 		}
 
-		if (target == null) {
+		if (!isNull && target == null) {
 			return "";
 		}
 
-		DbData secdata = target.getDbDatas().get(secattr);
-		if (secdata == null)
-			return "";
-		String secstr = secdata.getValue();
+		String secstr = null;
+		if (target != null)
+			secstr = target.getDbDatas().get(secattr).getValue();
 		List<String> tmpsplit3 = FormularParser.findPairs(parserpart);
 		for (String tmpparser : tmpsplit3) {
 			if (!tmpparser.contains("?"))
@@ -469,7 +478,7 @@ public class GenericUtils {
 				newparser = tpart;
 				newdata = dbData;
 			}
-			if ("*".equals(tmat) || secstr.equals(tmat)) {
+			if ("*".equals(tmat) || (secstr != null && secstr.equals(tmat))) {
 				String result = parseDataValue(newparser, newdata, dbOper,
 						dbEntry);
 				if (StringUtils.isNotEmpty(result))

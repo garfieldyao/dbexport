@@ -52,7 +52,7 @@ public abstract class BatchManager {
 								result = runTask(ip);
 							} catch (Exception ex) {
 								result.setException(ex);
-								ex.printStackTrace();
+								logger.error(ex.toString());
 							}
 							result.setIpAddr(ip);
 							return result;
@@ -80,7 +80,7 @@ public abstract class BatchManager {
 							logger.info(result.getIpAddr() + "\t\tFailed");
 						}
 					} catch (Exception ex) {
-						logger.error(ex.getLocalizedMessage());
+						logger.error(ex.toString());
 					}
 					tasklist.remove(task);
 					break;

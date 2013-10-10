@@ -145,6 +145,28 @@
 				<index>slot;logic</index>
 				<default>65535</default>
 			</attribute>
+			<attribute>
+				<cliname>max-ipv6-antispf</cliname>
+				<dbTable>portVlanTbl</dbTable>
+				<dbAttribute>nbV6Add</dbAttribute>
+				<index>slot;logic</index>
+				<default>65535</default>
+			</attribute>
+			<attribute>
+				<cliname>mac-learn-ctrl</cliname>
+				<dbTable>portVlanTbl</dbTable>
+				<dbAttribute>lnStat</dbAttribute>
+				<index>slot;logic</index>
+				<default>3</default>
+			</attribute>
+			<attribute>
+				<cliname>ds-dedicated-q</cliname>
+				<dbTable>portVlanTbl</dbTable>
+				<dbAttribute>dsDedQ</dbAttribute>
+				<index>slot;logic</index>
+				<parser>enum:(0x0,disable)(0x1,enable)</parser>
+				<default>0</default>
+			</attribute>
 		</attributes>
 	</mapping>
 </mappings>

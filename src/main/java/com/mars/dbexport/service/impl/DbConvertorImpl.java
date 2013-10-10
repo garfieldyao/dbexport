@@ -225,7 +225,7 @@ public class DbConvertorImpl implements DbConvertor, DbOper {
 		return commands;
 	}
 
-	public List<DbEntry> readDbFile(String tableName) {
+	private List<DbEntry> readDbFile(String tableName) {
 		List<DbEntry> datas = new ArrayList<DbEntry>();
 		File file = new File(ne.getDbPath());
 		FileInputStream fis = null;
