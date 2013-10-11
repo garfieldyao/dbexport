@@ -15,16 +15,16 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 public class FormularParser {
-	final static String add = "+";
-	final static String sub = "-";
-	final static String mul = "*";
-	final static String div = "/";
-	final static String and = "&";
-	final static String or = "|";
-	final static String left = "(";
-	final static String right = ")";
-	final static String shift_l = "<<";
-	final static String shift_r = ">>";
+	private final static String add = "+";
+	private final static String sub = "-";
+	private final static String mul = "*";
+	private final static String div = "/";
+	private final static String and = "&";
+	private final static String or = "|";
+	private final static String left = "(";
+	private final static String right = ")";
+	private final static String shift_l = "<<";
+	private final static String shift_r = ">>";
 	private final static List<String> operators = new ArrayList<String>();
 	static {
 		operators.add(shift_r);
@@ -68,12 +68,18 @@ public class FormularParser {
 			long subvalue = calculateFormularValue(formular.substring(sp + 1,
 					ep));
 			String subv = subvalue >= 0 ? subvalue + "" : ":" + (-subvalue);
-			formular = replaceSubString(formular, subv, sp, ep+1);
+			formular = replaceSubString(formular, subv, sp, ep + 1);
 		}
 		return calculatePureFormular(formular);
 	}
 
 	private static long calculatePureFormular(String subformular) {
+		if (isNumber(subformular))
+			return parseLong(subformular);
+
+		if (subformular.startsWith(sub))
+			subformular = ":" + subformular.substring(1);
+
 		for (String oper : operators) {
 			while (subformular.contains(oper)) {
 				String regx = "[:]?[0-9]+(\\" + oper + ")[:]?[0-9]+";
@@ -83,9 +89,13 @@ public class FormularParser {
 					String group = mat.group();
 					int pos = mat.start();
 					long sbvalue = calculateCellFormular(group, oper);
-					String subv = sbvalue >= 0 ? sbvalue + "" : ":" + (-sbvalue);
+					String subv = sbvalue >= 0 ? sbvalue + "" : ":"
+							+ (-sbvalue);
 					subformular = replaceSubString(subformular, subv, pos, pos
 							+ group.length());
+				} else {
+					// error
+					return 0;
 				}
 			}
 		}
@@ -206,7 +216,7 @@ public class FormularParser {
 	}
 
 	public static void main(String[] args) {
-		String str = "1+2-110*(10+10*(3-5))+55";
+		String str = "(-1+2-110*(10+9*(3-5))+55/11+(-3+5-100))>>5+1|3";
 		System.out.println(calculateFormularValue(str));
 	}
 }
